@@ -16,9 +16,16 @@ export const authenticateToken = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Extraire le token du header Authorization
+      // Extraire le token depuis le header ou le cookie
+    let token: string | undefined;
+
     const authHeader = req.headers.authorization;
-    const token = extractTokenFromHeader(authHeader);
+    if (authHeader) {
+      token = extractTokenFromHeader(authHeader)?? undefined;
+    } else if (req.cookies?.token) {
+      token = req.cookies.token; // <- depuis le cookie HttpOnly
+    }
+
 
     if (!token) {
       sendAuthError(res, "Token d'authentification manquant");

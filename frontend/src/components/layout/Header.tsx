@@ -3,6 +3,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Logo from "@/app/assets/Union.png";
+import dashboard from "@/app/assets/dashboard.png";
+import dashboardOrange from "@/app/assets/dashboard_orange.png";
+import projets from "@/app/assets/projets.png";
+import projetsWhite from "@/app/assets/projets_blanc.png";
+
 
 export default function Header() {
   const pathname = usePathname();
@@ -12,46 +19,104 @@ export default function Header() {
   const isProfile = pathname === "/auth/profile";
 
   return (
-    <header className="w-full bg-black/5 flex justify-center">
-      <div className="max-w-[1215px] w-full h-18 flex items-center justify-between px-4">
+    <header className="w-full  bg-white flex justify-center">
+      <div className="max-w-303.75 w-full  py-1 flex items-center justify-between px-4">
 
         {/* Logo */}
         <Link
           href="/dashboard"
-          className="text-2xl font-manrope font-bold"
+          className="text-2xl"
+          aria-label="Retour au tableau de bord"
         >
-          Abricot
+             <Image src={Logo} alt="Logo Abricot" width={147} priority />
         </Link>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className={`px-4 py-2 rounded-md text-sm font-inter ${
-              isDashboard
-                ? "bg-black text-white"
-                : "bg-white text-brand-dark border border-brand-dark"
-            }`}
-          >
-            Tableau de bord
-          </Link>
+      <nav className="flex items-center gap-4">
+        <Link
+          href="/dashboard"
+          aria-current={isDashboard ? "page" : undefined}
+          className={`
+            group relative
+            w-[248px] h-[78px]
+            flex items-center justify-center gap-3
+            rounded-md text-sm 
+            transition-colors
+            ${isDashboard
+              ? "bg-black text-white"
+              : "bg-white text-brand-dark border border-brand-dark"
+            }
+          `}
+        >
+        {/* Conteneur icône */} 
+        <span className="relative w-5 h-5 flex items-center justify-center"> 
+          
+          {/* Icône normale */} 
+          <Image src={isDashboard ? dashboard : dashboardOrange} 
+          alt="Dashboard" 
+          width={20} 
+          height={20} 
+          aria-hidden="true" 
+          className="transition-opacity group-hover:opacity-0" /> 
+          
+          {/* Icône hover */} 
+          <Image src={dashboardOrange} 
+          alt="DashboardOrange" 
+          width={20} 
+          height={20} 
+          aria-hidden="true" 
+          className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity" /> 
+          
+          </span>
 
-          <Link
-            href="/projets"
-            className={`px-4 py-2 rounded-md text-sm font-inter ${
-              isProjets
-                ? "bg-black text-white"
-                : "bg-white text-brand-dark border border-brand-dark"
-            }`}
-          >
-            Projets
-          </Link>
-        </nav>
+          Tableau de bord
+        </Link>
+
+        <Link
+          href="/projets"
+          aria-current={isProjets ? "page" : undefined}
+          className={`
+            group relative
+            w-[248px] h-[78px]
+            flex items-center justify-center gap-3
+            rounded-md text-sm 
+            transition-colors
+            ${isProjets
+              ? "bg-black text-white"
+              : "bg-white text-brand-dark border border-brand-dark"
+            }
+          `}
+        >
+          <span className="relative w-5 h-5 flex items-center justify-center"> 
+
+             <Image 
+             src={isProjets ? projetsWhite : projets}
+             alt="Projets" 
+             width={20} 
+             height={20} 
+             aria-hidden="true" 
+             className="transition-opacity group-hover:opacity-0"/>
+
+            <Image 
+             src={projets}
+             alt="Projets" 
+             width={20} 
+             height={20} 
+             aria-hidden="true"
+             className="absolute top-0.5 left-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+          </span>
+          Projets
+        </Link>
+      </nav>
+
 
         {/* Bouton AD */}
          <Link
           href="/auth/profile"
-          className={`w-10 h-10 rounded-full bg-brand-light flex items-center justify-center font-manrope font-semibold text-brand-dark
+           aria-label="Accéder à mon profil"
+          aria-current={isProfile ? "page" : undefined}
+          className={`w-16.25 h-16.25 rounded-full bg-brand-light flex items-center justify-center text-brand-dark
             ${isProfile ? "ring-2 ring-black" : ""} `}
         >
           AD

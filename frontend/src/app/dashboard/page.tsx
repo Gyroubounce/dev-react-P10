@@ -1,3 +1,7 @@
+import Image from "next/image";
+import Taches from "@/app/assets/Taches.png";
+import Kanban from "@/app/assets/Kanban.png";
+
 export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
@@ -13,15 +17,37 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* Boutons Liste / Kanban */}
+        {/* Boutons Liste / Kanban */}
       <div className="flex gap-3">
-        <button className="px-4 py-2 rounded-md bg-black text-white font-inter">
+
+        {/* Bouton Liste */}
+        <button
+          className="px-4 py-2 rounded-md bg-brand-light text-brand-dark flex items-center gap-2"
+        >
+          <Image
+            src={Taches}
+            alt=""
+            width={18}
+            height={18}
+            aria-hidden="true"
+          />
           Liste
         </button>
 
-        <button className="px-4 py-2 rounded-md bg-white border border-brand-dark text-brand-dark font-inter">
+        {/* Bouton Kanban */}
+        <button
+          className="px-4 py-2 rounded-md bg-white border border-brand-dark text-brand-dark flex items-center gap-2"
+        >
+          <Image
+            src={Kanban}
+            alt=""
+            width={18}
+            height={18}
+            aria-hidden="true"
+          />
           Kanban
         </button>
+
       </div>
 
       {/* Section Mes tâches */}

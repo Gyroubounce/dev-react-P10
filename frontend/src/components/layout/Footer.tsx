@@ -1,13 +1,19 @@
 // src/components/layout/Footer.tsx
+
+import Image from "next/image"; 
+import Logo from "@/app/assets/Logo.png";
+
 export default function Footer() {
   return (
-    <footer className="w-full bg-white flex justify-center border-t border-system-neutral mt-10">
-      <div className="w-full max-w-[1440px] h-18 flex items-center justify-between px-10">
-        <span className="text-[22px] font-manropeont-bold">
-          Abricot
-        </span>
+    <footer className="w-full bg-white flex justify-center border-t border-system-neutral mt-10"
+    aria-label="Pied de page">
+      <div className="w-full max-w-width[1440px] h-18 flex items-center justify-between px-10">
+                {/* Logo image */}
+        <div className="flex items-center">
+          <Image src={Logo} alt="Abricot - Accueil" width={120} height={40} priority />
+        </div>
 
-        <span className="text-[14px] font-inter text-text-secondary">
+        <span className="text-[14px] text-text-secondary">
           Abricot 2025
         </span>
       </div>

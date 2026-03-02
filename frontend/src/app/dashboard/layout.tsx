@@ -1,12 +1,22 @@
 // src/app/(dashboard)/layout.tsx
+
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value; // cookie http-only du backend
+
+  if (!token) {
+    redirect("/auth/login");
+  }
+
   return (
     <div className="min-h-screen bg-bg-dashboard flex flex-col">
       <Header />

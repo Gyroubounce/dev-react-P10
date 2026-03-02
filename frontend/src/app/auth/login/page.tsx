@@ -9,7 +9,9 @@ import ConnexionImg from "@/app/assets/Connexion.jpg";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen w-container-width justify-center">
+    <div className="flex min-h-screen w-container-width justify-center"
+    role="main"
+    aria-labelledby="login-page-title">
 
       {/* Colonne gauche */}
       <div className="w-140.5 max-w-full flex flex-col items-center bg-bg-dashboard px-4">
@@ -36,7 +38,8 @@ export default function LoginPage() {
             <div className="w-70.75 text-center mt-4">
               <Link
                 href="/auth/forgot-password"
-                className="text-brand-dark text-sm"
+                className="text-brand-dark text-sm underline focus:ring-2 focus:ring-brand-dark"
+                aria-label="Récupérer votre mot de passe"
               >
                 Mot de passe oublié ?
               </Link>
@@ -47,7 +50,7 @@ export default function LoginPage() {
         {/* Lien inscription en bas, marge bottom 60px */}
         <p className="mt-auto mb-15 text-center text-sm text-text-primary">
           Pas encore de compte ?{" "}
-          <Link href="/auth/register" className="text-brand-dark">
+          <Link href="/auth/register" className=" text-brand-dark underline focus:ring-2 focus:ring-brand-dark" aria-label="Créer un compte Abricot">
             Créer un compte
           </Link>
         </p>

@@ -9,7 +9,9 @@ import ConnexionImg from "@/app/assets/Connexion.jpg";
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen w-container-width justify-center">
+    <div className="flex min-h-screen w-container-width justify-center"
+    role="main"
+    aria-labelledby="register-page-title">
 
       {/* Colonne gauche */}
       <div className="w-140.5 max-w-full flex flex-col items-center bg-bg-dashboard px-4">
@@ -38,7 +40,8 @@ export default function RegisterPage() {
         {/* Lien inscription en bas, marge bottom 60px */}
         <p className="mt-auto mb-15 text-center text-sm text-text-primary">
           Déjà inscrit ?{" "}
-          <Link href="/auth/register" className="text-brand-dark">
+          <Link href="/auth/login" className="text-brand-dark underline focus:ring-2 focus:ring-brand-dark"
+          aria-label="Se connecter à votre compte Abricot">
             Se connecter
           </Link>
         </p>

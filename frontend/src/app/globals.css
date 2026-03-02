@@ -88,24 +88,15 @@ h1, h2, h3, h4, h5, h6 {
   border: 2px solid var(--color-bg-grey-light);
 }
 
-/* ==========================
-   LIENS
-========================== */
-a {
-  color: var(--color-brand-dark);
-  transition: color 0.2s;
-}
-a:hover {
-  color: var(--color-brand-light);
-}
 
 /* ==========================
    BOUTONS
 ========================== */
-button {
-  font-family: var(--font-inter);
-  cursor: pointer;
-  transition: all 0.15s;
+
+a:hover {
+  color: var(--color-brand-dark);
+  background-color: var(--color-bg-content);
+  border: 1px solid var(--color-brand-dark);
 }
 
 /* ==========================
@@ -116,6 +107,11 @@ input, select, textarea {
   outline: none;
 }
 
+input:focus
+  , select:focus
+  , textarea:focus {
+  border: 1px solid var(--color-brand-dark);
+}
 /* ==========================
    HR
 ========================== */

@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Inter, Manrope } from "next/font/google";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +30,9 @@ export default function RootLayout({
       className={`${inter.variable} ${manrope.variable}`}
     >
       <body>
-        {children}
+         <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

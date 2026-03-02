@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
@@ -30,6 +31,9 @@ const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Middleware cookie-parser (pour lire les cookies HttpOnly)
+app.use(cookieParser());
+
 // Middleware de sécurité
 app.use(helmet());
 
@@ -39,7 +43,7 @@ app.use(
     origin:
       process.env.NODE_ENV === "production"
         ? ["https://votre-domaine.com"]
-        : ["http://localhost:8000", "http://localhost:8001"],
+        : ["http://localhost:3000"],
     credentials: true,
   })
 );
