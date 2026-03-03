@@ -15,6 +15,7 @@ type AuthContextType = {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await res.json();
       console.log("Profil récupéré :", data);
-      setUser(data);
+      setUser(data.data.user);
     } catch (err) {
       console.error("Erreur refreshProfile :", err);
       setUser(null);
@@ -74,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      
 
       // Mettre à jour l'utilisateur
-      setUser(result.user);
+      setUser(result.data.user);
     } catch (err) {
       console.error("Erreur login :", err);
       throw err; // remonter l'erreur pour l'affichage côté formulaire
@@ -83,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 🔹 Logout
   function logout(): void {
-    localStorage.removeItem("token");
+   
     setUser(null);
   }
 
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

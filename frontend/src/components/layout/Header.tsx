@@ -113,7 +113,7 @@ export default function Header() {
 
         {/* Bouton AD */}
          <Link
-          href="/auth/profile"
+          href="/dashboard/account"
            aria-label="Accéder à mon profil"
           aria-current={isProfile ? "page" : undefined}
           className={`w-16.25 h-16.25 rounded-full bg-brand-light flex items-center justify-center text-brand-dark
