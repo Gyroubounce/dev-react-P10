@@ -7,10 +7,8 @@ import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { getInitials } from "@/lib/utils/initials";
 import Logo from "@/app/assets/Union.png";
-import dashboard from "@/app/assets/dashboard.png";
-import dashboardOrange from "@/app/assets/dashboard_orange.png";
-import projets from "@/app/assets/projets.png";
-import projetsWhite from "@/app/assets/projets_blanc.png";
+import DashboardIcon from "@/components/ui/icons/DashboardIcon";
+import FolderNavIcon from "@/components/ui/icons/FolderIcon";
 
 export default function Header() {
   const pathname = usePathname();
@@ -22,7 +20,7 @@ export default function Header() {
 
   return (
     <header className="w-full bg-white flex justify-center">
-      <div className="max-w-303.75 w-full h-[94px] flex items-center justify-between px-4">
+      <div className="max-w-303.75 w-full h-23.5 flex items-center justify-between px-4">
 
         {/* Logo */}
         <Link
@@ -30,7 +28,7 @@ export default function Header() {
           className="text-2xl"
           aria-label="Retour au tableau de bord"
         >
-          <Image src={Logo} alt="Logo Abricot" width={147} priority />
+           <Image src={Logo} alt="Logo- Accueil" width={147}  priority style={{ height: "auto" }} />
         </Link>
 
         {/* Navigation */}
@@ -45,29 +43,13 @@ export default function Header() {
               rounded-md text-sm
               transition-colors
               ${isDashboard
-                ? "bg-black text-white"
-                : "bg-white text-brand-dark border border-brand-dark"
+                ? "bg-black text-white hover:border border-brand-dark"
+                : "bg-white text-brand-dark hover:border border-brand-dark"
               }
             `}
           >
-            <span className="relative w-5 h-5 flex items-center justify-center">
-              <Image
-                src={isDashboard ? dashboard : dashboardOrange}
-                alt="Dashboard"
-                width={20}
-                height={20}
-                aria-hidden="true"
-                className="transition-opacity group-hover:opacity-0"
-              />
-              <Image
-                src={dashboardOrange}
-                alt="DashboardOrange"
-                width={20}
-                height={20}
-                aria-hidden="true"
-                className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-            </span>
+        <DashboardIcon className="w-5 h-5" aria-hidden="true" />
+            
             Tableau de bord
           </Link>
 
@@ -81,29 +63,12 @@ export default function Header() {
               rounded-md text-sm
               transition-colors
               ${isProjets
-                ? "bg-black text-white"
-                : "bg-white text-brand-dark border border-brand-dark"
+                ? "bg-black text-white hover:border border-brand-dark"
+                : "bg-white text-brand-dark hover:border border-brand-dark"
               }
             `}
           >
-            <span className="relative w-5 h-5 flex items-center justify-center">
-              <Image
-                src={isProjets ? projetsWhite : projets}
-                alt="Projets"
-                width={20}
-                height={20}
-                aria-hidden="true"
-                className="transition-opacity group-hover:opacity-0"
-              />
-              <Image
-                src={projets}
-                alt="Projets"
-                width={20}
-                height={20}
-                aria-hidden="true"
-                className="absolute top-0.5 left-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-            </span>
+        <FolderNavIcon className="w-6 h-6" aria-hidden="true" />
             Projets
           </Link>
         </nav>

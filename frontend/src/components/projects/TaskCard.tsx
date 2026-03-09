@@ -2,8 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  CalendarIcon,
-  EllipsisVerticalIcon,
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
@@ -11,6 +9,8 @@ import { formatDate } from "@/lib/utils/format";
 import { statusLabel, statusColor, priorityLabel } from "@/lib/utils/task";
 import { getInitials } from "@/lib/utils/initials";
 import type { Task } from "@/types/index";
+import CalendarIcon from "@/components/ui/icons/CalenderIcon";
+import CommentForm from "@/components/forms/CommentForm";
 
 type Props = {
   task: Task;
@@ -18,12 +18,14 @@ type Props = {
   onDelete: (taskId: string) => void;
   onEdit: (task: Task) => void;
   onStatusChange: (taskId: string, status: Task["status"]) => void;
+  onRefresh: () => void;
 };
 
-export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChange }: Props) {
+export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChange, onRefresh }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -35,33 +37,43 @@ export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChang
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
+
   return (
     <div
-      className="bg-bg-content rounded-[8px] shadow-card px-5 py-4 flex flex-col gap-3"
+      className="bg-bg-content rounded-[10px] border border-bg-grey-border px-5 py-4 flex flex-col gap-3"
       aria-label={`Tâche : ${task.title}`}
     >
-      {/* Ligne 1 : titre + label + menu */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-          <h3 className="font-manrope font-semibold text-text-primary text-sm truncate">
-            {task.title}
-          </h3>
-          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ${statusColor[task.status]}`}>
-            {statusLabel[task.status]}
-          </span>
-        </div>
+          {/* Ligne 1 : titre + label + menu */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="flex flex-col flex-1 min-w-0 gap-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-police-black text-lg truncate">
+                {task.title}
+              </h3>
+              <span className={`text-sm px-2.5 py-0.5 rounded-full shrink-0 ${statusColor[task.status]}`}>
+                {statusLabel[task.status]}
+              </span>
+            </div>
+
+            {/* Description — en dessous du titre */}
+            {task.description && (
+              <p className="text-sm text-text-secondary line-clamp-2">
+                {task.description}
+              </p>
+            )}
+          </div>                
 
         {/* Menu 3 points */}
         <div className="relative shrink-0" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="p-1 rounded hover:bg-bg-grey-light transition text-text-secondary"
+            className="flex justify-center items-center pb-2.5 text-lg rounded-[10px] w-14.25 h-14.25 text-police-grey border border-bg-grey-border hover:border-brand-dark hover:text-brand-dark transition"
             aria-label="Options de la tâche"
-            aria-expanded={menuOpen}
+            aria-expanded="false"
             aria-haspopup="menu"
           >
-            <EllipsisVerticalIcon className="h-4 w-4" />
+            ...
           </button>
 
           {menuOpen && (
@@ -116,39 +128,33 @@ export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChang
         </div>
       </div>
 
-      {/* Description */}
-      {task.description && (
-        <p className="text-xs text-text-secondary line-clamp-2">
-          {task.description}
-        </p>
-      )}
 
       {/* Échéance */}
       {task.dueDate && (
-        <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-          <CalendarIcon className="h-3.5 w-3.5" aria-hidden="true" />
+        <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-4">
           <span>Échéance :</span>
-          <time dateTime={task.dueDate}>{formatDate(task.dueDate)}</time>
+          <CalendarIcon className="h-3.75 w-3.75 text-text-primary" aria-hidden="true" />
+          <time dateTime={task.dueDate} className="text-text-primary" >{formatDate(task.dueDate)}</time>
         </div>
       )}
 
       {/* Assignés */}
       {task.assignees.length > 0 && (
-        <div className="flex items-center gap-2 text-xs text-text-secondary">
+        <div className="flex items-center gap-2 text-xs text-text-secondary mb-4">
           <span>Assigné à :</span>
           <div className="flex items-center gap-1.5 flex-wrap">
             {task.assignees.map((a) => (
               <div key={a.id} className="flex items-center gap-1">
                 <div
-                  className="w-5 h-5 rounded-full bg-bg-grey-light flex items-center justify-center"
+                  className="w-6.75 h-6.75 rounded-full bg-system-neutral flex items-center justify-center"
                   title={a.user.name}
                   aria-label={a.user.name}
                 >
-                  <span className="text-[10px] font-semibold text-text-primary">
+                  <span className="text-[10px] text-btn-black">
                     {getInitials(a.user.name)}
                   </span>
                 </div>
-                <span className="text-text-primary">{a.user.name}</span>
+                <span className=" text-sm text-police-grey bg-system-neutral px-2 py-0.5 rounded-full">{a.user.name}</span>
               </div>
             ))}
           </div>
@@ -166,8 +172,8 @@ export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChang
       <button
         type="button"
         onClick={() => setCommentsOpen((v) => !v)}
-        className="flex items-center justify-between text-xs text-text-secondary hover:text-text-primary transition"
-        aria-expanded={commentsOpen}
+        className="flex items-center justify-between text-xs text-text-primary hover:text-text-primary transition"
+        aria-expanded="false"
         aria-controls={`comments-${task.id}`}
       >
         <span className="flex items-center gap-1.5">
@@ -175,9 +181,9 @@ export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChang
           Commentaires ({task.comments.length})
         </span>
         {commentsOpen ? (
-          <ChevronUpIcon className="h-3.5 w-3.5" aria-hidden="true" />
+          <ChevronDownIcon className="h-5 w-5 text-btn-black" aria-hidden="true" />
         ) : (
-          <ChevronDownIcon className="h-3.5 w-3.5" aria-hidden="true" />
+          <ChevronUpIcon className="h-5 w-5 text-btn-black" aria-hidden="true" />
         )}
       </button>
 
@@ -191,35 +197,42 @@ export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChang
 
               {/* Initiales — en dehors du container */}
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-1 ${
+                className={`w-6.75 h-6.75 rounded-full flex items-center justify-center shrink-0 mt-1 ${
                   comment.author.id === ownerId ? "bg-brand-light" : "bg-[#E5E7EB]"
                 }`}
                 aria-hidden="true"
               >
-                <span className="text-[10px] font-semibold text-text-primary">
+                <span className="text-[10px] text-btn-black">
                   {getInitials(comment.author.name)}
                 </span>
               </div>
 
               {/* Container commentaire */}
-              <div className="flex flex-col gap-0.5 bg-bg-grey-light rounded-[8px] px-3 py-2 flex-1">
+              <div className="flex flex-col justify-center h-20.75 gap-5 bg-bg-grey-light rounded-[10px] px-3 py-2 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium text-text-primary">
+                  <span className="text-sm text-police-black">
                     {comment.author.name}
                   </span>
                   <time
-                    className="text-[10px] text-[#1F1F1F] shrink-0"
+                    className="text-[10px] text-text-secondary shrink-0"
                     dateTime={comment.createdAt}
                   >
                     {formatDate(comment.createdAt)}
                   </time>
                 </div>
-                <p className="text-xs text-[#1F1F1F]">{comment.content}</p>
+                <p className="text-[10px] text-police-black">{comment.content}</p>
               </div>
 
             </div>
           ))
         )}
+
+        {/* Ajouter un commentaire */}
+           <CommentForm
+            projectId={task.projectId}
+            taskId={task.id}
+            onRefresh={onRefresh}
+          />
       </div>
     )}
 

@@ -6,6 +6,7 @@ import CommentsIcon from "@/components/ui/icons/CommentsIcon";
 import { formatDate } from "@/lib/utils/format";
 import { statusLabel, statusColor } from "@/lib/utils/task";
 import type { TaskWithProject } from "@/types/index";
+import Button from "@/components/ui/Button";
 
 type Props = {
   task: TaskWithProject;
@@ -31,7 +32,7 @@ export default function TaskCardList({ task, onEdit }: Props) {
           </p>
         )}
 
-        <div className="flex items-center gap-2 text-xs text-text-secondary flex-wrap my-5">
+        <div className="flex items-center gap-3 text-xs text-text-secondary flex-wrap my-5">
 
           <span className="flex items-center gap-1">
             <FolderIcon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -68,14 +69,9 @@ export default function TaskCardList({ task, onEdit }: Props) {
         <span className={`text-xs px-2 py-1 rounded-full ${statusColor[task.status]}`}>
           {statusLabel[task.status]}
         </span>
-        <button
-          type="button"
-          onClick={() => onEdit(task)}
-          className="text-xs bg-btn-black w-30.25 h-12.5 text-text-white hover:text-brand-dark hover:bg-bg-content hover:border border-brand-dark focus:ring-2 focus:ring-brand-dark rounded-md px-3 py-1 transition"
-          aria-label={`Modifier la tâche ${task.title}`}
-        >
+        <Button variant="voir" onClick={() => onEdit(task)} ariaLabel={`Modifier la tâche ${task.title}`}>
           Voir
-        </button>
+        </Button>
       </div>
 
     </div>

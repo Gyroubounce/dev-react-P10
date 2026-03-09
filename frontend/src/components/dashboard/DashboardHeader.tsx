@@ -1,6 +1,6 @@
-import Image from "next/image";
-import Taches from "@/app/assets/Taches.png";
-import Kanban from "@/app/assets/Kanban.png";
+import ListIcon from "@/components/ui/icons/ListIcon";
+import KanbanIcon from "@/components/ui/icons/CalenderIcon";
+import Button from "@/components/ui/Button";
 
 type Props = {
   name: string;
@@ -29,14 +29,9 @@ export default function DashboardHeader({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onCreateProject}
-          className="px-4 py-2 w-45.25 h-12.5 rounded-md bg-btn-2-Black text-white text-[16px] hover:text-brand-dark hover:bg-bg-content hover:border border-brand-dark transition"
-          aria-label="Créer un nouveau projet"
-        >
+        <Button variant="creer-projet" onClick={() => onCreateProject()} ariaLabel="Créer un nouveau projet">
           + Créer un projet
-        </button>
+        </Button>
       </div>
 
       {/* Boutons Liste / Kanban */}
@@ -45,13 +40,13 @@ export default function DashboardHeader({
           type="button"
           onClick={() => onViewChange("list")}
           aria-pressed="false"
-          className={`px-4 py-2 w-23.5 h-11.25 rounded-md flex items-center gap-2 text-sm transition ${
+          className={`px-4 py-2 w-23.5 h-11.25 rounded-md flex items-center gap-3 text-sm transition ${
             view === "list"
               ? "bg-brand-light text-brand-dark font-medium"
-              : "bg-bg-content text-text-secondary hover:bg-brand-light hover:text-brand-dark"
+              : "bg-bg-content text-brand-dark hover:bg-brand-light hover:text-brand-dark"
           }`}
         >
-          <Image src={Taches} alt="" width={18} height={18} aria-hidden="true" />
+          <ListIcon className="w-4 h-4" aria-hidden="true" />
           Liste
         </button>
 
@@ -59,13 +54,13 @@ export default function DashboardHeader({
           type="button"
           onClick={() => onViewChange("kanban")}
           aria-pressed="false"
-          className={`px-3 py-2 w-23.5 h-11.25 rounded-md flex items-center gap-2 text-sm transition ${
+          className={`px-3 py-2 rounded-md flex items-center gap-3 text-sm transition ${
             view === "kanban"
               ? "bg-brand-light text-brand-dark font-medium"
-              : "bg-bg-content text-text-secondary hover:bg-brand-light hover:text-brand-dark"
+              : "bg-bg-content text-brand-dark hover:bg-brand-light hover:text-brand-dark"
           }`}
         >
-          <Image src={Kanban} alt="" width={18} height={18} aria-hidden="true" />
+          <KanbanIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
           Kanban
         </button>
       </div>

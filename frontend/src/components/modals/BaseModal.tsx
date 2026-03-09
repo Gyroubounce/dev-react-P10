@@ -38,14 +38,9 @@ export default function BaseModal({
         className={`bg-bg-content rounded-[8px] shadow-modal w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 flex flex-col gap-5`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2
-            id={id}
-            className="font-manrope font-semibold text-text-primary text-lg"
-          >
-            {title}
-          </h2>
+       {/* Header */}
+      <div className="flex flex-col">
+        <div className="flex justify-end">
           <button
             type="button"
             onClick={onClose}
@@ -55,6 +50,13 @@ export default function BaseModal({
             <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
+        <h2
+          id={id}
+          className="font-semibold text-text-primary text-2xl mt-2"
+        >
+          {title}
+        </h2>
+      </div>
 
         {/* Contenu */}
         {children}

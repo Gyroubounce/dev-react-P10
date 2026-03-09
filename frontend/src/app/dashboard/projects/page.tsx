@@ -6,6 +6,7 @@ import { useModal } from "@/hooks/useModal";
 import ProjectCard from "@/components/projects/ProjectCard";
 import CreateProjectModal from "@/components/modals/CreateProjectModal";
 import type { User } from "@/types/index";
+import Button from "@/components/ui/Button";
 
 export default function ProjectsPage() {
   const { projects, loading, error, fetchProjects, createProject, addContributor } = useProjects();
@@ -34,21 +35,17 @@ export default function ProjectsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-[28px] font-manrope font-semibold text-text-primary">
-            Mes Projets
+          <h1 className="text-[28px] font-semibold text-text-primary">
+            Mes projets
           </h1>
-          <p className="text-sm text-text-secondary">
+          <p className="text-lg text-police-black">
             Gérez vos projets
           </p>
         </div>
 
-        <button
-          onClick={() => openModal("createProject")}
-          className="px-4 py-2 bg-btn-black text-text-white text-sm font-medium rounded-md hover:opacity-90 transition"
-          aria-label="Créer un nouveau projet"
-        >
+        <Button variant="creer-projet" onClick={() => openModal("createProject")} ariaLabel="Créer un nouveau projet">
           + Créer un projet
-        </button>
+        </Button>
       </div>
 
       {/* États */}

@@ -1,15 +1,11 @@
 "use client";
 
-import Image from "next/image";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import StarAI from "@/app/assets/Star_AI.png";
-import StarFocus from "@/app/assets/Star_focus.png";
 import {
   ArrowLeftIcon,
   MagnifyingGlassIcon,
-  ListBulletIcon,
-  CalendarIcon,
 } from "@heroicons/react/24/outline";
 import { useProject } from "@/hooks/useProject";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +17,10 @@ import EditProjectModal from "@/components/modals/EditProjectModal";
 import CreateTaskModal from "@/components/modals/CreateTaskModal";
 import AITaskModal from "@/components/modals/AITaskModal";
 import type { Task } from "@/types/index";
+import Button from "@/components/ui/Button";
+import IAIcon from "@/components/ui/icons/IAIcon";
+import ListIcon from "@/components/ui/icons/ListIcon";
+import KanbanIcon from "@/components/ui/icons/CalenderIcon";
 
 type FilterStatus = Task["status"] | "ALL";
 
@@ -41,7 +41,6 @@ export default function ProjectDetailPage() {
     deleteTask,
   } = useProject(id);
   const { isOpen, openModal, closeModal } = useModal();
-  const [aiHover, setAiHover] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("ALL");
@@ -94,66 +93,54 @@ export default function ProjectDetailPage() {
   return (
     <div className="flex flex-col gap-6">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.push("/dashboard/projects")}
-            className="w-8 h-8 flex items-center justify-center border border-system-neutral rounded-md bg-bg-content hover:bg-bg-grey-light transition"
-            aria-label="Retour aux projets"
-          >
-            <ArrowLeftIcon className="h-4 w-4 text-text-primary" />
-          </button>
+   {/* Header */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard/projects")}
+              className="w-14 h-14 flex items-center justify-center border border-system-neutral rounded-md bg-bg-content hover:bg-bg-grey-light transition"
+              aria-label="Retour aux projets"
+            >
+              <ArrowLeftIcon className="h-4 w-4 text-text-primary" />
+            </button>
 
-          <div className="flex flex-col gap-0.5">
-            <h1 className="font-semibold text-[24px] text-text-primary">
-              {project.name}
-            </h1>
-            {isOwner && (
-              <button
-                type="button"
-                onClick={() => openModal("editProject")}
-                className="text-xs text-brand-dark underline hover:text-btn-black transition self-start"
-              >
-                modifier
-              </button>
-            )}
-            {project.description && (
-              <p className="text-[18px] text-text-secondary mt-1">
-                {project.description}
-              </p>
-            )}
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-3">
+                <h1 className="font-semibold text-[24px] text-text-primary">
+                  {project.name}
+                </h1>
+                {isOwner && (
+                  <button
+                    type="button"
+                    onClick={() => openModal("editProject")}
+                    className="text-sm text-brand-dark underline hover:text-btn-black transition"
+                  >
+                    modifier
+                  </button>
+                )}
+              </div>
+              {project.description && (
+                <p className="text-[18px] text-text-secondary">
+                  {project.description}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-
+      
         {/* Boutons Créer une tâche + IA */}
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => openModal("createTask")}
-            className="px-4 py-2 bg-btn-black text-text-white text-sm rounded-md hover:text-brand-dark hover:bg-bg-content border border-brand-dark transition"
-          >
-            Créer une tâche
-          </button>
+        <Button variant="creer-tache" onClick={() => openModal("createTask")} ariaLabel="Créer une nouvelle tâche">
+          Créer une tâche
+        </Button>
 
           <button
             type="button"
             onClick={() => openModal("aiTask")}
-            onMouseEnter={() => setAiHover(true)}
-            onMouseLeave={() => setAiHover(false)}
-            onFocus={() => setAiHover(true)}
-            onBlur={() => setAiHover(false)}
-            className="flex items-center gap-1.5 px-3 py-2  bg-brand-dark text-text-white text-sm  rounded-md hover:bg-bg-content hover:text-brand-dark border border-brand-dark transition"
+            className="flex items-center justify-center gap-1 w-23.5 h-12.5 bg-brand-dark text-text-white text-sm  rounded-[10px] hover:bg-bg-content hover:text-brand-dark border border-brand-dark transition"
             aria-label="Générer des tâches avec l'IA"
           >
-            <Image
-              src={aiHover ? StarAI : StarFocus}
-              alt=""
-              width={16}
-              height={16}
-              aria-hidden="true"
-            />
+           <IAIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
             IA
           </button>
         </div>
@@ -161,16 +148,16 @@ export default function ProjectDetailPage() {
 
       {/* Contributeurs */}
       <section
-        className="bg-bg-grey-light rounded-[8px] px-6 py-5"
+        className="bg-bg-grey-light rounded-[10px] px-8 py-3"
         aria-labelledby="contributors-title"
       >
         <div className="flex items-center justify-between gap-4">
           <h2
             id="contributors-title"
-            className="font-semibold text-text-primary text-base"
+            className="font-semibold text-text-primary text-lg"
           >
             Contributeurs{" "}
-            <span className="text-text-secondary font-normal">
+            <span className="text-base text-text-secondary ml-1">
               {project.members.length + 1} personnes
             </span>
           </h2>
@@ -180,16 +167,16 @@ export default function ProjectDetailPage() {
             {/* Propriétaire */}
             <li className="flex items-center gap-2">
               <div
-                className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center shrink-0"
+                className="w-6.75 h-6.75 rounded-full bg-brand-light flex items-center justify-center shrink-0"
                 aria-hidden="true"
               >
-                <span className="text-xs font-semibold text-text-primary">
+                <span className="text-[10px]  text-text-btn-black">
                   {getInitials(project.owner.name)}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 
-                <span className="text-xs text-brand-dark bg-brand-light px-2 py-0.5 rounded-full">
+                <span className="text-sm text-brand-dark bg-brand-light px-2 py-0.5 rounded-full">
                   Propriétaire
                 </span>
               </div>
@@ -199,14 +186,14 @@ export default function ProjectDetailPage() {
             {project.members.map((member) => (
               <li key={member.id} className="flex items-center gap-2">
                 <div
-                  className="w-8 h-8 rounded-full bg-system-neutral border border-system-neutral flex items-center justify-center shrink-0"
+                  className="w-6.75 h-6.75 rounded-full bg-system-neutral border border-system-neutral flex items-center justify-center shrink-0"
                   aria-hidden="true"
                 >
-                  <span className="text-xs font-semibold text-text-primary">
+                  <span className="text-[10px]  text-text-btn-black">
                     {getInitials(member.user.name)}
                   </span>
                 </div>
-                <span className="text-sm text-text-primary bg-system-neutral px-2 py-0.5 rounded-full">
+                <span className="text-sm text-text-secondary bg-system-neutral px-2 py-0.5 rounded-full">
                   {member.user.name}
                 </span>
               </li>
@@ -217,68 +204,80 @@ export default function ProjectDetailPage() {
 
       {/* Tâches */}
       <section
-        className="bg-bg-content rounded-[8px] shadow-card px-6 py-5 flex flex-col gap-4"
+        className="bg-bg-content rounded-[10px] shadow-card px-6 py-5 flex flex-col gap-4"
         aria-labelledby="tasks-title"
       >
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           <h2
             id="tasks-title"
-            className="font-semibold text-text-primary text-base"
+            className="font-semibold text-text-primary text-lg"
           >
             Tâches
           </h2>
 
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <p className="text-xs text-text-secondary">
+            <p className="text-base text-text-secondary">
               {view === "list" ? "Par ordre de priorité" : "Par ordre d'échéance"}
             </p>
 
             <div className="flex items-center gap-2 flex-wrap">
 
               {/* Vue Liste / Calendrier */}
-              <div className="flex gap-1" role="group" aria-label="Mode d'affichage">
+              <div className="flex gap-3" role="group" aria-label="Mode d'affichage">
                 <button
                   type="button"
                   onClick={() => setView("list")}
                   aria-pressed="false"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition ${
+                  className={`px-4 py-2 w-23.5 h-11.25 rounded-md flex items-center gap-3 text-sm transition  ${
                     view === "list"
                       ? "bg-brand-light text-brand-dark"
-                      : "bg-white text-brand-dark hover:border border-brand-dark"
+                      : "bg-white text-brand-dark  hover:bg-brand-light"
                   }`}
                 >
-                  <ListBulletIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  <ListIcon className="w-4 h-4" aria-hidden="true" />
                   Liste
                 </button>
                 <button
                   type="button"
                   onClick={() => setView("calendar")}
                   aria-pressed="false"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition ${
+                  className={`px-3 py-2 rounded-md flex items-center gap-3 text-sm transition  ${
                     view === "calendar"
                       ? "bg-brand-light text-brand-dark"
-                      : "bg-white text-brand-dark hover:border border-brand-dark"
+                      : "bg-white text-brand-dark hover:bg-brand-light"
                   }`}
                 >
-                  <CalendarIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  <KanbanIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
                   Calendrier
                 </button>
               </div>
 
               {/* Filtre statut */}
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-                className="text-xs border border-system-neutral rounded-md px-3 py-1.5 bg-bg-content text-text-primary transition"
-                aria-label="Filtrer par statut"
-              >
-                <option value="ALL">Statut</option>
-                <option value="TODO">À faire</option>
-                <option value="IN_PROGRESS">En cours</option>
-                <option value="DONE">Terminée</option>
-                <option value="CANCELLED">Annulée</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+                  className="w-38 h-15.75 text-sm border border-system-neutral rounded-md bg-bg-content text-text-secondary transition  pr-8 text-center appearance-none cursor-pointer"
+                  aria-label="Filtrer par statut"
+                >
+                  <option value="ALL">Statut</option>
+                  <option value="TODO">À faire</option>
+                  <option value="IN_PROGRESS">En cours</option>
+                  <option value="DONE">Terminée</option>
+                  <option value="CANCELLED">Annulée</option>
+                </select>
 
+                {/* Flèche custom — même couleur que le texte */}
+                <svg
+                  className="absolute right-5 top-1/2 -translate-y-1/2 h-7 w-7 text-text-secondary pointer-events-none"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={0.8}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
+                </svg>
+              </div>
               {/* Recherche */}
               <div className="relative">
                 <input
@@ -286,11 +285,11 @@ export default function ProjectDetailPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Rechercher une tâche"
-                  className="pl-4 pr-8 py-1.5 text-xs border border-system-neutral rounded-md bg-bg-content text-text-primary w-48 transition"
+                  className="w-70.75 h-15.75 pl-6 pr-8 py-1.5 text-xs border border-system-neutral rounded-md bg-bg-content text-text-primary transition"
                   aria-label="Rechercher une tâche"
                 />
                 <MagnifyingGlassIcon
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
+                  className="absolute right-8 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
                   aria-hidden="true"
                 />
               </div>
@@ -317,6 +316,7 @@ export default function ProjectDetailPage() {
                     openModal("editTask");
                   }}
                   onStatusChange={updateTaskStatus}
+                  onRefresh={fetchProject}
                 />
               </li>
             ))}
@@ -341,14 +341,18 @@ export default function ProjectDetailPage() {
       {isOpen("createTask") && (
         <CreateTaskModal
           members={project.members}
+          ownerId={project.owner.id}
           onClose={closeModal}
-          onSubmit={createTask}
+          onSubmit={(title, description, dueDate, assigneeIds, status) =>
+      createTask(title, description, dueDate, assigneeIds, status, "MEDIUM")
+    }
         />
       )}
 
       {isOpen("editTask") && editingTask && (
         <CreateTaskModal
           members={project.members}
+          ownerId={project.owner.id}
           initialTask={editingTask}
           onClose={() => {
             closeModal();

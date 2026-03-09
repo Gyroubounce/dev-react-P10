@@ -69,15 +69,23 @@ export default function TasksSection({
 
  
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over) return;
-    const task = tasks.find((t) => t.id === active.id);
-    const newStatus = over.id as TaskWithProject["status"];
-    if (task && task.status !== newStatus) {
-      onUpdateTaskStatus(task.id, task.projectId, newStatus);
-    }
+function handleDragEnd(event: DragEndEvent) {
+  const { active, over } = event;
+  if (!over) return;
+
+  const task = tasks.find((t) => t.id === active.id);
+  if (!task) return;
+
+  // over.id peut être un statut (colonne) ou un taskId (carte)
+  const overTask = tasks.find((t) => t.id === over.id);
+  const newStatus = overTask
+    ? overTask.status
+    : (over.id as TaskWithProject["status"]);
+
+  if (task.status !== newStatus) {
+    onUpdateTaskStatus(task.id, task.projectId, newStatus);
   }
+}
 
   function handleEdit(task: TaskWithProject) {
     setEditingTask(task);

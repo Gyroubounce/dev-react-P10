@@ -34,3 +34,14 @@ export async function deleteTask(projectId: string, taskId: string) {
     method: "DELETE",
   });
 }
+
+export async function createComment(
+  projectId: string,
+  taskId: string,
+  content: string
+) {
+  return apiRequest(`/projects/${projectId}/tasks/${taskId}/comments`, {
+    method: "POST",
+    body: { content },
+  });
+}

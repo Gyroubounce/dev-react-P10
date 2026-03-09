@@ -8,6 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { formatDate } from "@/lib/utils/format";
 import { statusLabel, statusColor } from "@/lib/utils/task";
 import type { TaskWithProject } from "@/types/index";
+import Button from "@/components/ui/Button";
 
 type Props = {
   task: TaskWithProject;
@@ -88,14 +89,9 @@ export default function TaskCardKanban({ task, onEdit }: Props) {
       </div>
 
       <div className="px-6 pb-5">
-        <button
-          type="button"
-          onClick={() => onEdit(task)}
-          className="text-xs bg-btn-black w-30.25 h-12.5 text-text-white hover:text-brand-dark hover:bg-bg-content hover:border border-brand-dark focus:ring-2 focus:ring-brand-dark rounded-md px-3 py-1 transition"
-          aria-label={`Modifier la tâche ${task.title}`}
-        >
-          Voir
-        </button>
+      <Button variant="voir" onClick={() => onEdit(task)} ariaLabel={`Modifier la tâche ${task.title}`}>
+        Voir
+      </Button>
       </div>
 
     </div>

@@ -8,20 +8,21 @@ import type { Task, ProjectMember } from "@/types/index";
 type Props = {
   members: ProjectMember[];
   initialTask?: Partial<Task>;
+  ownerId?: string;
   onClose: () => void;
   onSubmit: (
     title: string,
     description: string,
     dueDate: string,
     assigneeIds: string[],
-    status: Task["status"],
-    priority: Task["priority"]
+    status: Task["status"]
   ) => Promise<void>;
 };
 
 export default function CreateTaskModal({
   members,
   initialTask,
+  ownerId,
   onClose,
   onSubmit,
 }: Props) {
@@ -33,13 +34,12 @@ export default function CreateTaskModal({
     description: string,
     dueDate: string,
     assigneeIds: string[],
-    status: Task["status"],
-    priority: Task["priority"]
+    status: Task["status"]
   ) {
     setError(null);
     setLoading(true);
     try {
-      await onSubmit(title, description, dueDate, assigneeIds, status, priority);
+      await onSubmit(title, description, dueDate, assigneeIds, status);
       onClose();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -60,6 +60,7 @@ export default function CreateTaskModal({
       <TaskForm
         initialTask={initialTask}
         members={members}
+        ownerId={ownerId}
         submitLabel={isEdit ? "Enregistrer" : "+ Ajouter une tâche"}
         loading={loading}
         error={error}

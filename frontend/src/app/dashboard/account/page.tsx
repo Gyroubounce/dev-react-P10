@@ -19,7 +19,7 @@ export default function AccountPage() {
       className="min-h-screen bg-bg-dashboard py-12 px-4"
       aria-labelledby="account-title"
     >
-      <div className="max-w-[1215px] mx-auto bg-bg-content rounded-[8px] shadow-card p-10">
+      <div className="max-w-303.75 mx-auto bg-bg-content rounded-[8px] shadow-card p-10">
 
         <h1
           id="account-title"
