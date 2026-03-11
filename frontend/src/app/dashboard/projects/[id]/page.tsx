@@ -89,6 +89,23 @@ export default function ProjectDetailPage() {
   }
 
   const isOwner = project.owner.id === user?.id;
+  // Propriétaire
+  const owner = project.owner;
+
+  // Contributeurs uniques (hors propriétaire)
+  const uniqueContributors = Array.from(
+    new Map(
+      project.tasks?.flatMap((task) =>
+        task.assignees
+          ?.filter((a) => a.user.id !== owner.id)
+          .map((a) => [a.user.id, a.user]) || []
+      ) || []
+    ).values()
+  );
+
+  // Total
+  const totalContributors = 1 + uniqueContributors.length;
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -99,10 +116,10 @@ export default function ProjectDetailPage() {
             <button
               type="button"
               onClick={() => router.push("/dashboard/projects")}
-              className="w-14 h-14 flex items-center justify-center border border-system-neutral rounded-md bg-bg-content hover:bg-bg-grey-light transition"
+              className="w-14 h-14 flex items-center justify-center border border-system-neutral rounded-md bg-bg-content hover:border-brand-dark  transition"
               aria-label="Retour aux projets"
             >
-              <ArrowLeftIcon className="h-4 w-4 text-text-primary" />
+              <ArrowLeftIcon className="h-4 w-4 text-btn-black  hover:text-brand-dark" />
             </button>
 
             <div className="flex flex-col gap-0.5">
@@ -147,6 +164,7 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Contributeurs */}
+            
       <section
         className="bg-bg-grey-light rounded-[10px] px-8 py-3"
         aria-labelledby="contributors-title"
@@ -158,7 +176,20 @@ export default function ProjectDetailPage() {
           >
             Contributeurs{" "}
             <span className="text-base text-text-secondary ml-1">
-              {project.members.length + 1} personnes
+              {(() => {
+                // Calculer les contributeurs uniques des tâches (SANS le propriétaire)
+                const uniqueTaskContributors = new Set<string>();
+                project.tasks?.forEach((task) => {
+                  task.assignees?.forEach((assignee) => {
+                    // ✅ Exclure le propriétaire
+                    if (assignee.user.id !== project.owner.id) {
+                      uniqueTaskContributors.add(assignee.user.id);
+                    }
+                  });
+                });
+                // Total = contributeurs uniques + propriétaire
+                return uniqueTaskContributors.size + 1;
+              })()} personnes
             </span>
           </h2>
 
@@ -170,34 +201,46 @@ export default function ProjectDetailPage() {
                 className="w-6.75 h-6.75 rounded-full bg-brand-light flex items-center justify-center shrink-0"
                 aria-hidden="true"
               >
-                <span className="text-[10px]  text-text-btn-black">
+                <span className="text-[10px] text-text-btn-black">
                   {getInitials(project.owner.name)}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                
                 <span className="text-sm text-brand-dark bg-brand-light px-2 py-0.5 rounded-full">
                   Propriétaire
                 </span>
               </div>
             </li>
 
-            {/* Contributeurs */}
-            {project.members.map((member) => (
-              <li key={member.id} className="flex items-center gap-2">
-                <div
-                  className="w-6.75 h-6.75 rounded-full bg-system-neutral border border-system-neutral flex items-center justify-center shrink-0"
-                  aria-hidden="true"
-                >
-                  <span className="text-[10px]  text-text-btn-black">
-                    {getInitials(member.user.name)}
+            {/* Contributeurs uniques des tâches (SANS le propriétaire) */}
+            {(() => {
+              // Récupérer les objets User uniques (en excluant le propriétaire)
+              const uniqueContributors = Array.from(
+                new Map(
+                  project.tasks?.flatMap((task) => 
+                    task.assignees
+                      ?.filter((a) => a.user.id !== project.owner.id) // ✅ Exclure le propriétaire
+                      .map((a) => [a.user.id, a.user]) || []
+                  ) || []
+                ).values()
+              );
+
+              return uniqueContributors.map((user) => (
+                <li key={user.id} className="flex items-center gap-2">
+                  <div
+                    className="w-6.75 h-6.75 rounded-full bg-bg-grey-border flex items-center justify-center shrink-0"
+                    aria-hidden="true"
+                  >
+                    <span className="text-[10px] text-text-secondary">
+                      {getInitials(user.name)}
+                    </span>
+                  </div>
+                  <span className="text-sm text-text-secondary bg-bg-grey-border px-2 py-0.5 rounded-full">
+                    {user.name}
                   </span>
-                </div>
-                <span className="text-sm text-text-secondary bg-system-neutral px-2 py-0.5 rounded-full">
-                  {member.user.name}
-                </span>
-              </li>
-            ))}
+                </li>
+              ));
+            })()}
           </ul>
         </div>
       </section>
@@ -332,6 +375,8 @@ export default function ProjectDetailPage() {
           initialDescription={project.description ?? ""}
           initialMembers={project.members}
           ownerId={project.owner.id}
+          uniqueContributors={uniqueContributors}
+          totalContributors={totalContributors}
           onClose={closeModal}
           onSubmit={updateProject}
           onAddContributor={addContributor}

@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 
 type Props = {
   task: TaskWithProject;
+  ownerId?: string;
   onEdit: (task: TaskWithProject) => void;
 };
 

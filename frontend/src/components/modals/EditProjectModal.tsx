@@ -10,6 +10,8 @@ type Props = {
   initialDescription: string;
   initialMembers: ProjectMember[];
   ownerId: string; // 
+  uniqueContributors: User[];
+  totalContributors: number;
   onClose: () => void;
   onSubmit: (name: string, description: string) => Promise<void>;
   onAddContributor: (email: string) => Promise<void>;
@@ -20,11 +22,14 @@ export default function EditProjectModal({
   initialName,
   initialDescription,
   initialMembers,
+  ownerId,
+  uniqueContributors,
+  totalContributors,
   onClose,
   onSubmit,
   onAddContributor,
   onRemoveContributor,
-  ownerId,
+
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +75,8 @@ export default function EditProjectModal({
         initialName={initialName}
         initialDescription={initialDescription}
         initialMembers={initialMembers}
+        uniqueContributors={uniqueContributors}
+        totalContributors={totalContributors}
         submitLabel="Enregistrer"
         loading={loading}
         error={error}

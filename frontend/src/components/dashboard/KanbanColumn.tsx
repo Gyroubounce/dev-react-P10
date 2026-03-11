@@ -1,24 +1,25 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import TaskCardKanban from "@/components/dashboard/TaskCardKanban";
-import type { TaskWithProject } from "@/types/index";
+import type { TaskWithProject, Project } from "@/types/index"; // ✅ Ajouter import Project
 
 type Props = {
   id: TaskWithProject["status"];
   title: string;
   tasks: TaskWithProject[];
+  projects: Project[];
   onEdit: (task: TaskWithProject) => void;
 };
 
-export default function KanbanColumn({ id, title, tasks, onEdit }: Props) {
+export default function KanbanColumn({ id, title, tasks, projects, onEdit }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <section
-      aria-label={`Colonne ${title} —  tâche${tasks.length > 1 ? "s" : ""}`}
+      aria-label={`Colonne ${title} — ${tasks.length} tâche${tasks.length > 1 ? "s" : ""}`}
       className="flex flex-col gap-3 w-93.75"
     >
-      <div className="flex items-center px-1">
+      <div className="flex items-center gap-2 px-1">
         <h3 className="font-semibold text-text-primary text-[18px]">
           {title}
         </h3>
@@ -46,11 +47,21 @@ export default function KanbanColumn({ id, title, tasks, onEdit }: Props) {
                 Aucune tâche
               </li>
             ) : (
-              tasks.map((task) => (
-                <li key={task.id}>
-                  <TaskCardKanban task={task} onEdit={onEdit} />
-                </li>
-              ))
+              tasks.map((task) => {
+                // ✅ Récupérer l'ownerId pour chaque tâche
+                const taskProject = projects.find((p) => p.id === task.projectId);
+                const taskOwnerId = taskProject?.owner?.id;
+
+                return (
+                  <li key={task.id}>
+                    <TaskCardKanban 
+                      task={task} 
+                      ownerId={taskOwnerId} // ✅ Passer ownerId
+                      onEdit={onEdit} 
+                    />
+                  </li>
+                );
+              })
             )}
           </ul>
         </SortableContext>

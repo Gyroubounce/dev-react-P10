@@ -8,7 +8,7 @@ import type { User } from "@/types/index";
 
 type Props = {
   onClose: () => void;
-  onSubmit: (name: string, description: string) => Promise<void>;
+  onSubmit: (name: string, description: string, contributors: User[]) => Promise<void>;
 };
 
 export default function CreateProjectModal({ onClose, onSubmit }: Props) {
@@ -21,7 +21,7 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
     setError(null);
     setLoading(true);
     try {
-      await onSubmit(name, description);
+      await onSubmit(name, description, selectedContributors);
       onClose();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -42,7 +42,11 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
   console.log("Owner ID:", user?.id); // ✅ Déboguer
 
   return (
-    <BaseModal id="create-project-title" title="Créer un projet" onClose={onClose}>
+    <BaseModal 
+    id="create-project-title" 
+    title="Créer un projet" 
+    onClose={onClose}>
+      
       <ProjectForm
         submitLabel="+ Créer le projet"
         loading={loading}
@@ -51,8 +55,11 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
         onAddContributor={handleAddContributor}
         onRemoveContributor={handleRemoveContributor}
         selectedContributors={selectedContributors}
-        ownerId={user?.id} // ✅ Passer l'ID de l'utilisateur connecté
+        ownerId={user?.id} 
+        uniqueContributors = {selectedContributors}
+        totalContributors = {selectedContributors.length}
       />
     </BaseModal>
   );
 }
+   

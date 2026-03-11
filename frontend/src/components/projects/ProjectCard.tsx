@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getInitials } from "@/lib/utils/initials";
 import type { ProjectWithStats } from "@/hooks/useProjects";
-import EquipeIcon from "@/components/ui/icons//EquipeIcon";
+import EquipeIcon from "@/components/ui/icons/EquipeIcon";
 
 type Props = {
   project: ProjectWithStats;
@@ -9,15 +9,36 @@ type Props = {
 
 export default function ProjectCard({ project }: Props) {
   const owner = project.owner;
-  const contributors = project.members;
 
+  // ✅ Récupérer tous les contributeurs uniques des tâches
+  const allTaskContributors = new Set<string>();
+  project.tasks?.forEach((task) => {
+    task.assignees?.forEach((assignee) => {
+      allTaskContributors.add(assignee.user.id);
+    });
+  });
+
+  // ✅ Ajouter le propriétaire
+  const totalContributors = allTaskContributors.size + 1; // +1 pour le owner
+
+  // ✅ Récupérer les objets User uniques
+  const uniqueContributors = Array.from(
+    new Map(
+      project.tasks?.flatMap((task) => 
+        task.assignees?.map((a) => [a.user.id, a.user]) || []
+      ) || []
+    ).values()
+  );
+
+
+  
   return (
     <Link
       href={`/dashboard/projects/${project.id}`}
       className="bg-bg-content rounded-[8px] shadow-card p-5 flex flex-col hover:shadow-modal transition"
       aria-label={`Voir le projet ${project.name}`}
     >
-      <h2 className="font-semibold text-text-primary text-lg  ">
+      <h2 className="font-semibold text-text-primary text-lg">
         {project.name}
       </h2>
 
@@ -38,26 +59,27 @@ export default function ProjectCard({ project }: Props) {
         <div
           className="w-full h-1.5 mt-1 bg-bg-grey-light rounded-full overflow-hidden"
           role="progressbar"
-          aria-valuenow={project.progression}
+          aria-valuenow={Number(project.progression) || 0}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`Progression du projet : ${project.progression}%`}
-        >
+          >
           <div
-            className="h-full bg-brand-dark rounded-full transition-all"
+            className="h-full  bg-brand-dark rounded-full transition-all"
             style={{ width: `${project.progression}%` }}
-          />
+            />
+          </div>
+
+          <span className="text-xs text-text-secondary">
+            {project.completedTasks}/{project.totalTasks} tâches terminées
+          </span>
         </div>
 
-        <span className="text-xs text-text-secondary">
-          {project.completedTasks}/{project.totalTasks} tâches terminées
-        </span>
-      </div>
-
+      
       <div className="flex flex-col gap-2">
-        <span className="flex  gap-1 text-[10px] font-medium text-text-secondary">
+        <span className="flex gap-1 text-[10px] font-medium text-text-secondary">
           <EquipeIcon className="w-3 h-3" />
-          Équipe ({project.members.length + 1})
+          Équipe ({totalContributors})
         </span>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -78,16 +100,16 @@ export default function ProjectCard({ project }: Props) {
             </span>
           </div>
 
-          {/* Contributeurs */}
-          {contributors.map((member) => (
+          {/* Contributeurs uniques des tâches */}
+          {uniqueContributors.map((user) => (
             <div
-              key={member.id}
-              className="w-7 h-7 rounded-full bg-bg-grey-light flex items-center justify-center"
-              aria-label={member.user.name}
-              title={member.user.name}
-            >
-              <span className="text-[10px] text-text-primary">
-                {getInitials(member.user.name)}
+              key={user.id}
+              className="w-7 h-7 rounded-full bg-bg-grey-border flex items-center justify-center"
+              aria-label={user.name}
+              title={user.name}
+              >
+              <span className="text-[10px] text-text-secondary">
+                {getInitials(user.name)}
               </span>
             </div>
           ))}

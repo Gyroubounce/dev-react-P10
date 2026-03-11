@@ -23,6 +23,7 @@
   --color-text-error: #EF4444;
   --color-text-warning: #E08D00;
   --color-text-info: #3B82F6;
+  --color-text-neutral: #9CA3AF;
 
   /* Backgrounds */
   --color-bg-dashboard: #F9FAFB;
@@ -113,6 +114,8 @@ a:hover {
 input, select, textarea {
   font-family: var(--font-inter);
   outline: none;
+  border: 1px solid var(--color-bg-grey-border);
+  border-radius: 4px;
 }
 
 input:focus

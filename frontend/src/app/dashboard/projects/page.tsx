@@ -21,12 +21,19 @@ export default function ProjectsPage() {
     description: string,
     contributors: User[]
   ) {
+    try {
     const projectId = await createProject(name, description);
     if (!projectId) return;
+
     await Promise.all(
       contributors.map((user) => addContributor(projectId, user.email))
     );
+
     await fetchProjects();
+    } catch (error) {
+    console.error("Erreur lors de la création du projet:", error);
+    throw error; // Pour que CreateProjectModal affiche l'erreur
+  }
   }
 
   return (

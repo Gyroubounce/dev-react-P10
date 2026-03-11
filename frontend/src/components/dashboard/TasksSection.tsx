@@ -51,14 +51,14 @@ export default function TasksSection({
   const { isOpen, openModal, closeModal } = useModal();
 
   const {
-  search,
-  setSearch,
-  filterStatus,
-  setFilterStatus,
-  filterPriority,
-  setFilterPriority,
-  filteredTasks,
-} = useTaskFilters(tasks);
+    search,
+    setSearch,
+    filterStatus,
+    setFilterStatus,
+    filterPriority,
+    setFilterPriority,
+    filteredTasks,
+  } = useTaskFilters(tasks);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -67,34 +67,32 @@ export default function TasksSection({
     })
   );
 
- 
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
 
-function handleDragEnd(event: DragEndEvent) {
-  const { active, over } = event;
-  if (!over) return;
+    const task = tasks.find((t) => t.id === active.id);
+    if (!task) return;
 
-  const task = tasks.find((t) => t.id === active.id);
-  if (!task) return;
+    const overTask = tasks.find((t) => t.id === over.id);
+    const newStatus = overTask
+      ? overTask.status
+      : (over.id as TaskWithProject["status"]);
 
-  // over.id peut être un statut (colonne) ou un taskId (carte)
-  const overTask = tasks.find((t) => t.id === over.id);
-  const newStatus = overTask
-    ? overTask.status
-    : (over.id as TaskWithProject["status"]);
-
-  if (task.status !== newStatus) {
-    onUpdateTaskStatus(task.id, task.projectId, newStatus);
+    if (task.status !== newStatus) {
+      onUpdateTaskStatus(task.id, task.projectId, newStatus);
+    }
   }
-}
 
   function handleEdit(task: TaskWithProject) {
     setEditingTask(task);
     openModal("editTask");
   }
 
-  // Récupérer les membres du projet de la tâche en cours d'édition
-  const editingTaskMembers: ProjectMember[] =
-    projects.find((p) => p.id === editingTask?.projectId)?.members ?? [];
+  // ✅ Récupérer le projet de la tâche en cours d'édition
+  const editingTaskProject = projects.find((p) => p.id === editingTask?.projectId);
+  const editingTaskMembers: ProjectMember[] = editingTaskProject?.members ?? [];
+  const editingTaskOwnerId = editingTaskProject?.owner?.id; // ✅ Récupérer l'ownerId
 
   return (
     <section aria-labelledby="tasks-title">
@@ -113,7 +111,7 @@ function handleDragEnd(event: DragEndEvent) {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-                       <select
+            <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
               className="text-sm border border-system-neutral rounded-[8px] px-3 py-2 bg-bg-content text-text-primary transition"
@@ -139,7 +137,7 @@ function handleDragEnd(event: DragEndEvent) {
               <option value="LOW">Basse</option>
             </select>
 
-             <div className="relative">
+            <div className="relative">
               <input
                 type="search"
                 value={search}
@@ -149,10 +147,10 @@ function handleDragEnd(event: DragEndEvent) {
                 aria-label="Rechercher une tâche"
               />
               <MagnifyingGlassIcon
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
-                  aria-hidden="true"
-                />
-              </div>
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
+                aria-hidden="true"
+              />
+            </div>
 
           </div>
         </div>
@@ -179,11 +177,21 @@ function handleDragEnd(event: DragEndEvent) {
         {/* Vue Liste */}
         {!loading && !error && view === "list" && filteredTasks.length > 0 && (
           <div className="flex flex-col gap-3" role="list" aria-label="Liste des tâches">
-            {filteredTasks.map((task) => (
-              <div key={task.id} role="listitem">
-                <TaskCardList task={task} onEdit={handleEdit} />
-              </div>
-            ))}
+            {filteredTasks.map((task) => {
+              // ✅ Récupérer l'ownerId pour chaque tâche
+              const taskProject = projects.find((p) => p.id === task.projectId);
+              const taskOwnerId = taskProject?.owner?.id;
+              
+              return (
+                <div key={task.id} role="listitem">
+                  <TaskCardList 
+                    task={task} 
+                    ownerId={taskOwnerId} // ✅ Passer ownerId
+                    onEdit={handleEdit} 
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -201,6 +209,7 @@ function handleDragEnd(event: DragEndEvent) {
                   id={col.id}
                   title={col.label}
                   tasks={filteredTasks.filter((t) => t.status === col.id)}
+                  projects={projects} // ✅ Passer projects pour récupérer ownerId
                   onEdit={handleEdit}
                 />
               ))}
@@ -215,11 +224,12 @@ function handleDragEnd(event: DragEndEvent) {
         <CreateTaskModal
           members={editingTaskMembers}
           initialTask={editingTask}
+          ownerId={editingTaskOwnerId} // ✅ Passer ownerId
           onClose={() => {
             closeModal();
             setEditingTask(null);
           }}
-          onSubmit={async (title, description, dueDate, assigneeIds, status, ) => {
+          onSubmit={async (title, description, dueDate, assigneeIds, status) => {
             await onUpdateTaskStatus(editingTask.id, editingTask.projectId, status);
             closeModal();
             setEditingTask(null);

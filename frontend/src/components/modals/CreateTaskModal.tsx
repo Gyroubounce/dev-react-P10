@@ -54,7 +54,7 @@ export default function CreateTaskModal({
   return (
     <BaseModal
       id="task-modal-title"
-      title={isEdit ? "Modifier la tâche" : "Créer une tâche"}
+      title={isEdit ? "Modifier" : "Créer une tâche"}
       onClose={onClose}
     >
       <TaskForm

@@ -146,21 +146,30 @@ export default function TaskCard({ task, ownerId,onDelete, onEdit, onStatusChang
             {task.assignees.map((a) => (
               <div key={a.id} className="flex items-center gap-1">
                 <div
-                  className="w-6.75 h-6.75 rounded-full bg-system-neutral flex items-center justify-center"
+                  className={`w-6.75 h-6.75 rounded-full flex items-center justify-center ${
+                    a.user.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
+                  }`}
                   title={a.user.name}
                   aria-label={a.user.name}
                 >
-                  <span className="text-[10px] text-btn-black">
+                  <span className={`text-[10px] ${
+                    a.user.id === ownerId ? "text-text-primary" : "text-text-secondary"
+                  }`}>
                     {getInitials(a.user.name)}
                   </span>
                 </div>
-                <span className=" text-sm text-police-grey bg-system-neutral px-2 py-0.5 rounded-full">{a.user.name}</span>
+                <span className={`text-sm px-2 py-0.5 rounded-full ${
+                  a.user.id === ownerId 
+                    ? "bg-brand-light text-text-primary" 
+                    : "bg-bg-grey-border text-text-secondary"
+                }`}>
+                  {a.user.name}
+                </span>
               </div>
             ))}
           </div>
         </div>
       )}
-
       {/* Priorité */}
       <div className="text-xs text-text-secondary">
         Priorité : <span className="text-text-primary font-medium">{priorityLabel[task.priority]}</span>

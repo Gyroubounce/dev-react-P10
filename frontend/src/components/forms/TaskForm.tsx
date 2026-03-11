@@ -141,12 +141,24 @@ export default function TaskForm({
             <div className="flex flex-wrap gap-2 mb-1">
               {selectedAssignees.map((u) => (
                 <div key={u.id} className="flex items-center gap-1.5 bg-bg-grey-light rounded-full px-2 py-1">
-                  <div className="w-5 h-5 rounded-full bg-brand-light flex items-center justify-center shrink-0">
-                    <span className="text-[9px] font-semibold text-text-primary">
+                  {/* ✅ Avatar avec initiales */}
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                    u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
+                  }`}>
+                    <span className={`text-[10px] ${
+                      u.id === ownerId ? "text-text-primary" : "text-text-secondary"
+                    }`}>
                       {getInitials(u.name)}
                     </span>
                   </div>
-                  <span className="text-xs text-text-primary">{u.name}</span>
+                  {/* ✅ Badge avec nom */}
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    u.id === ownerId 
+                      ? "bg-brand-light text-text-primary" 
+                      : "bg-bg-grey-border text-text-secondary"
+                  }`}>
+                    {u.name}
+                  </span>
                   <button
                     type="button"
                     onClick={() => removeAssignee(u.id)}
@@ -164,11 +176,16 @@ export default function TaskForm({
             <button
               type="button"
               onClick={() => setAssigneeOpen((v) => !v)}
-              className="w-full flex items-center justify-between border border-system-neutral rounded-[8px] px-4 py-3 text-sm bg-bg-content transition"
+              className="w-full h-13.25 flex items-center justify-between border border-system-neutral rounded-[8px] px-4 py-3 text-sm bg-bg-content transition"
             >
-              <span className="text-text-secondary">Choisir un nouveau collaborateur</span>
+              <span className="text-text-secondary">
+                {selectedAssignees.length > 0 
+                  ? `${selectedAssignees.length} collaborateur${selectedAssignees.length > 1 ? 's' : ''}` 
+                  : "Choisir un ou plusieurs collaborateurs"
+                }
+              </span>
               <svg
-                className={`h-4 w-4 text-[#6B7280] transition-transform ${assigneeOpen ? "rotate-180" : ""}`}
+                className={`h-7 w-7 text-text-secondary transition-transform ${assigneeOpen ? "rotate-180" : ""}`}
                 viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"
@@ -179,7 +196,7 @@ export default function TaskForm({
             </button>
 
             {assigneeOpen && availableUsers.length > 0 && (
-              <div className="absolute top-full left-0 right-0 z-20 bg-bg-content border border-system-neutral rounded-[8px] shadow-modal mt-1 overflow-hidden">
+              <div className="absolute top-full left-0 right-0 z-20 bg-bg-content border border-system-neutral rounded-[8px] shadow-modal mt-1 overflow-hidden max-h-48 overflow-y-auto">
                 {availableUsers.map((u) => (
                 <button
                   key={u.id}
@@ -190,12 +207,16 @@ export default function TaskForm({
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
                     u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
                   }`}>
-                    <span className="text-[9px] font-semibold text-text-secondary">
+                    <span className={`text-[9px] font-semibold ${
+                      u.id === ownerId ? "text-text-primary" : "text-text-secondary"
+                    }`}>
                       {getInitials(u.name)}
                     </span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-sm text-text-secondary ${
-                    u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
+                  <span className={`px-2 py-0.5 rounded-full text-sm ${
+                    u.id === ownerId 
+                      ? "bg-brand-light text-text-primary" 
+                      : "bg-bg-grey-border text-text-secondary"
                   }`}>
                     {u.name}
                   </span>
@@ -240,7 +261,7 @@ export default function TaskForm({
           <button
             type="submit"
             disabled={loading || !title.trim() || !description.trim() || !dueDate || !status}
-            className="w-45.25 h-12.5 bg-system-neutral text-text-primary text-sm rounded-[8px] hover:border border-brand-dark hover:bg-bg-content hover:text-brand-dark transition disabled:opacity-50"
+            className="w-45.25 h-12.5 bg-system-neutral text-text-neutral text-base rounded-[8px] hover:border border-brand-dark hover:bg-bg-content hover:text-brand-dark transition disabled:opacity-50"
           >
             {loading ? "En cours..." : submitLabel}
           </button>

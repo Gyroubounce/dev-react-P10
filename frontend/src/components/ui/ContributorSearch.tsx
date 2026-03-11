@@ -11,7 +11,8 @@ type Props = {
   onAdd: (user: User) => void;
   onRemove: (userId: string) => void;
   label?: string;
-  ownerId?: string; // ✅ Ajout du ownerId
+  ownerId?: string; 
+  buttonLabel?: string;
 };
 
 export default function ContributorSearch({
@@ -20,7 +21,8 @@ export default function ContributorSearch({
   onAdd,
   onRemove,
   label = "Contributeurs",
-  ownerId, // ✅ Ajout du ownerId
+  ownerId, 
+  buttonLabel = "Choisir un ou plusieurs collaborateurs",
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -80,11 +82,11 @@ export default function ContributorSearch({
         <button
           type="button"
           onClick={() => setIsOpen((v) => !v)}
-          className="w-full flex items-center justify-between border border-system-neutral rounded-[8px] px-4 py-3 text-sm bg-bg-content transition"
+          className="w-full h-13.25 flex items-center justify-between border border-system-neutral rounded-[8px] px-4 py-3 text-sm bg-bg-content transition"
         >
-          <span className="text-text-secondary">Choisir un nouveau collaborateur</span>
+        <span className="text-text-secondary">{buttonLabel}</span> 
           <svg
-            className={`h-4 w-4 text-[#6B7280] transition-transform ${
+            className={`h-6 w-6 text-btn-black transition-transform ${
               isOpen ? "rotate-180" : ""
             }`}
             viewBox="0 0 20 20"
@@ -95,6 +97,7 @@ export default function ContributorSearch({
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
           </svg>
         </button>
+   
 
         {/* Liste des utilisateurs disponibles */}
         {isOpen && availableUsers.length > 0 && (
