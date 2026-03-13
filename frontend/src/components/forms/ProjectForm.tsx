@@ -5,6 +5,7 @@ import ContributorSearch from "@/components/ui/ContributorSearch";
 import { getInitials } from "@/lib/utils/initials";
 import type { User, ProjectMember } from "@/types/index";
 
+
 type Props = {
   initialName?: string;
   initialDescription?: string;
@@ -13,6 +14,11 @@ type Props = {
   loading: boolean;
   error: string | null;
   onSubmit: (name: string, description: string) => Promise<void>;
+
+  projectId?: string; 
+  onDelete: () => void;
+
+
   onAddContributor?: (user: User) => void;
   onRemoveContributor?: (userId: string) => void;
   selectedContributors?: User[];
@@ -29,6 +35,10 @@ export default function ProjectForm({
   loading,
   error,
   onSubmit,
+
+  onDelete,
+  projectId,
+
   onAddContributor,
   onRemoveContributor,
   selectedContributors = [],
@@ -38,6 +48,7 @@ export default function ProjectForm({
 }: Props) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
+  
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -179,15 +190,34 @@ const contributors = uniqueContributors;
           </p>
         )}
 
-        {/* Bouton */}
-        <button
-          type="submit"
-          disabled={loading || !name.trim()}
-          className="mt-2 w-46.25 h-12.5 py-2.5 bg-system-neutral text-text-neutral text-base rounded-[10px] hover:border border-brand-dark hover:text-brand-dark hover:bg-bg-content transition"
-        >
-          {loading ? "En cours..." : submitLabel}
-        </button>
+          {/* Zone des actions */}
+        <div className="flex flex-row justify-between mt-4">
+
+          {/* Bouton enregistrer */}
+          <button
+            type="submit"
+            disabled={loading || !name.trim()}
+            className="w-46.25 h-12.5 py-2.5 bg-system-neutral text-text-neutral text-base rounded-[10px] hover:border border-brand-dark hover:text-brand-dark hover:bg-bg-content transition"
+          >
+            {loading ? "En cours..." : submitLabel}
+          </button>
+
+          {/* Bouton supprimer */}
+          {onDelete && projectId && (
+            <button
+              type="button"
+              className="text-text-error hover:text-red-700 text-sm"
+              aria-label="Supprimer le projet"
+              onClick={onDelete}
+
+            >
+              Supprimer le projet
+            </button>
+          )}
+        </div>
       </div>
-    </form>
+        
+    </form>    
   );
 }
+

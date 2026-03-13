@@ -36,6 +36,17 @@ type Props = {
     projectId: string,
     status: TaskWithProject["status"]
   ) => void;
+  updateTask: (
+    taskId: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      dueDate: string;
+      status: TaskWithProject["status"];
+      priority: TaskWithProject["priority"];
+      assigneeIds: string[];
+    }>
+  ) => Promise<void>;
 };
 
 export default function TasksSection({
@@ -45,6 +56,7 @@ export default function TasksSection({
   error,
   view,
   onUpdateTaskStatus,
+  updateTask,
 }: Props) {
 
   const [editingTask, setEditingTask] = useState<TaskWithProject | null>(null);
@@ -89,10 +101,10 @@ export default function TasksSection({
     openModal("editTask");
   }
 
-  // ✅ Récupérer le projet de la tâche en cours d'édition
+  // Récupérer le projet de la tâche en cours d'édition
   const editingTaskProject = projects.find((p) => p.id === editingTask?.projectId);
   const editingTaskMembers: ProjectMember[] = editingTaskProject?.members ?? [];
-  const editingTaskOwnerId = editingTaskProject?.owner?.id; // ✅ Récupérer l'ownerId
+  const editingTaskOwnerId = editingTaskProject?.owner?.id;
 
   return (
     <section aria-labelledby="tasks-title">
@@ -101,10 +113,7 @@ export default function TasksSection({
         {/* En-tête */}
         <div className="flex items-center justify-between flex-wrap gap-3 my-3">
           <div className="flex flex-col gap-0.5">
-            <h2
-              id="tasks-title"
-              className="text-[18px] font-semibold text-text-primary"
-            >
+            <h2 id="tasks-title" className="text-[18px] font-semibold text-text-primary">
               Mes tâches assignées
             </h2>
             <p className="text-[16px] text-text-secondary">Par ordre de priorité</p>
@@ -151,7 +160,6 @@ export default function TasksSection({
                 aria-hidden="true"
               />
             </div>
-
           </div>
         </div>
 
@@ -178,16 +186,15 @@ export default function TasksSection({
         {!loading && !error && view === "list" && filteredTasks.length > 0 && (
           <div className="flex flex-col gap-3" role="list" aria-label="Liste des tâches">
             {filteredTasks.map((task) => {
-              // ✅ Récupérer l'ownerId pour chaque tâche
               const taskProject = projects.find((p) => p.id === task.projectId);
               const taskOwnerId = taskProject?.owner?.id;
-              
+
               return (
                 <div key={task.id} role="listitem">
-                  <TaskCardList 
-                    task={task} 
-                    ownerId={taskOwnerId} // ✅ Passer ownerId
-                    onEdit={handleEdit} 
+                  <TaskCardList
+                    task={task}
+                    ownerId={taskOwnerId}
+                    onEdit={handleEdit}
                   />
                 </div>
               );
@@ -209,7 +216,7 @@ export default function TasksSection({
                   id={col.id}
                   title={col.label}
                   tasks={filteredTasks.filter((t) => t.status === col.id)}
-                  projects={projects} // ✅ Passer projects pour récupérer ownerId
+                  projects={projects}
                   onEdit={handleEdit}
                 />
               ))}
@@ -224,13 +231,21 @@ export default function TasksSection({
         <CreateTaskModal
           members={editingTaskMembers}
           initialTask={editingTask}
-          ownerId={editingTaskOwnerId} // ✅ Passer ownerId
+          ownerId={editingTaskOwnerId}
           onClose={() => {
             closeModal();
             setEditingTask(null);
           }}
-          onSubmit={async (title, description, dueDate, assigneeIds, status) => {
-            await onUpdateTaskStatus(editingTask.id, editingTask.projectId, status);
+          onSubmit={async (title, description, dueDate, assigneeIds, status, priority) => {
+            await updateTask(editingTask.id, {
+              title,
+              description,
+              dueDate,
+              assigneeIds,
+              status,
+              priority,
+            });
+
             closeModal();
             setEditingTask(null);
           }}

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import BaseModal from "@/components/modals/BaseModal";
 import ProjectForm from "@/components/forms/ProjectForm";
+import ModalProjectDelete from "@/components/modals/ModalProjectDelete";
 import type { ProjectMember, User } from "@/types/index";
 
 type Props = {
+  projectId: string;
   initialName: string;
   initialDescription: string;
   initialMembers: ProjectMember[];
@@ -16,9 +18,11 @@ type Props = {
   onSubmit: (name: string, description: string) => Promise<void>;
   onAddContributor: (email: string) => Promise<void>;
   onRemoveContributor: (userId: string) => Promise<void>;
+  onDelete: (projectId: string) => Promise<void>;
 };
 
 export default function EditProjectModal({
+  projectId,
   initialName,
   initialDescription,
   initialMembers,
@@ -29,11 +33,12 @@ export default function EditProjectModal({
   onSubmit,
   onAddContributor,
   onRemoveContributor,
-
+  onDelete,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedContributors, setSelectedContributors] = useState<User[]>([]);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   async function handleSubmit(name: string, description: string) {
     setError(null);
@@ -69,6 +74,7 @@ export default function EditProjectModal({
     }
   }
 
+
   return (
     <BaseModal id="edit-project-title" title="Modifier un projet" onClose={onClose}>
       <ProjectForm
@@ -85,7 +91,19 @@ export default function EditProjectModal({
         onRemoveContributor={handleRemoveContributor}
         selectedContributors={selectedContributors}
         ownerId={ownerId}
+        projectId={projectId}
+        onDelete={() => setDeleteOpen(true)}
       />
+
+         {deleteOpen && (
+        <ModalProjectDelete
+          onClose={() => setDeleteOpen(false)}
+          onConfirm={async () => {
+            await onDelete(projectId);
+            onClose();
+          }}
+        />
+      )}
     </BaseModal>
   );
 }

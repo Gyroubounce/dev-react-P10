@@ -16,6 +16,7 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
+  register: (email: string, password: string) => Promise<void>; 
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -82,6 +83,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // 🔹 Register
+async function register(email: string, password: string): Promise<void> {
+  try {
+    console.log("Tentative d'inscription :", { email, password });
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    });
+
+    const result = await res.json();
+    console.log("Réponse register :", result);
+
+    if (!res.ok) {
+      throw new Error(result.message || "Erreur lors de l'inscription");
+    }
+
+    // 🔥 Normalisation identique à login()
+    setUser(result.data.user);
+
+  } catch (err) {
+    console.error("Erreur register :", err);
+    throw err;
+  }
+}
+
+
   // 🔹 Logout
   function logout(): void {
    
@@ -93,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshProfile, register }}>
       {children}
     </AuthContext.Provider>
   );

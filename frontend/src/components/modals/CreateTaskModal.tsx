@@ -15,7 +15,8 @@ type Props = {
     description: string,
     dueDate: string,
     assigneeIds: string[],
-    status: Task["status"]
+    status: Task["status"],
+    priority: Task["priority"]   
   ) => Promise<void>;
 };
 
@@ -34,12 +35,21 @@ export default function CreateTaskModal({
     description: string,
     dueDate: string,
     assigneeIds: string[],
-    status: Task["status"]
+    status: Task["status"],
+    priority: Task["priority"]
   ) {
     setError(null);
     setLoading(true);
+
     try {
-      await onSubmit(title, description, dueDate, assigneeIds, status);
+      // 🔒 Sécurisation de la date ISO
+      const isoDate =
+        dueDate && dueDate.trim() !== ""
+          ? new Date(dueDate).toISOString()
+          : "";
+
+      await onSubmit(title, description, isoDate, assigneeIds, status, priority);
+
       onClose();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -64,7 +74,7 @@ export default function CreateTaskModal({
         submitLabel={isEdit ? "Enregistrer" : "+ Ajouter une tâche"}
         loading={loading}
         error={error}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit}  // 🟩 transmet maintenant priority automatiquement
       />
     </BaseModal>
   );

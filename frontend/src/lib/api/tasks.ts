@@ -19,9 +19,11 @@ export async function createTask(
 export async function updateTask(
   projectId: string,
   taskId: string,
-  data: Partial<Pick<Task, "title" | "description" | "dueDate" | "status" | "priority">> & {
-    assigneeIds?: string[];
-  }
+  data: Partial<
+    Pick<Task, "title" | "description" | "dueDate" | "status" | "priority"> & {
+      assigneeIds?: string[];
+    }
+  >
 ) {
   return apiRequest(`/projects/${projectId}/tasks/${taskId}`, {
     method: "PUT",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { fetchProjects as apiFetchProjects, createProject as apiCreateProject, addContributor as apiAddContributor, fetchProjectTasks } from "@/lib/api/projects";
+import { fetchProjects as apiFetchProjects, createProject as apiCreateProject, addContributor as apiAddContributor, fetchProjectTasks, deleteProject as apiDeleteProject, } from "@/lib/api/projects";
 import type { Project, Task } from "@/types/index";
 
 export type ProjectWithStats = Project & {
@@ -57,5 +57,11 @@ export function useProjects() {
     if (err) throw new Error(err);
   }
 
-  return { projects, loading, error, fetchProjects, createProject, addContributor };
+  async function deleteProject(projectId: string): Promise<void> {
+    const { error } = await apiDeleteProject(projectId);
+    if (error) throw new Error(error);
+}
+
+
+  return { projects, loading, error, fetchProjects, createProject, addContributor, deleteProject };
 }

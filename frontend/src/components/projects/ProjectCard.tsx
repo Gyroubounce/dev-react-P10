@@ -100,19 +100,22 @@ export default function ProjectCard({ project }: Props) {
             </span>
           </div>
 
-          {/* Contributeurs uniques des tâches */}
-          {uniqueContributors.map((user) => (
-            <div
-              key={user.id}
-              className="w-7 h-7 rounded-full bg-bg-grey-border flex items-center justify-center"
-              aria-label={user.name}
-              title={user.name}
-              >
-              <span className="text-[10px] text-text-secondary">
-                {getInitials(user.name)}
-              </span>
-            </div>
-          ))}
+       {/* Contributeurs uniques des tâches (hors propriétaire) */}
+      {uniqueContributors
+        .filter((user) => user.id !== owner.id)
+        .map((user) => (
+          <div
+            key={user.id}
+            className="w-7 h-7 rounded-full bg-bg-grey-border flex items-center justify-center"
+            aria-label={user.name}
+            title={user.name}
+          >
+            <span className="text-[10px] text-text-secondary">
+              {getInitials(user.name)}
+            </span>
+          </div>
+        ))}
+
 
         </div>
       </div>
