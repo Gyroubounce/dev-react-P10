@@ -1,17 +1,16 @@
 "use client";
 
-import { getUsers } from "@/lib/api/users";
-import { useEffect, useState } from "react";
-import { getInitials } from "@/lib/utils/initials";
+import { useState } from "react";
+import MemberSearch from "@/components/ui/MemberSearch";
 import { statusLabel, statusColor } from "@/lib/utils/task";
 import type { Task, User, ProjectMember } from "@/types/index";
 
 const statusOptions = (Object.entries(statusLabel) as [Task["status"], string][])
   .filter(([value]) => value !== "CANCELLED");
 
-type Props = {
+type TaskFormProps = {
   initialTask?: Partial<Task>;
-  members?: ProjectMember[];
+  members: ProjectMember[];
   ownerId?: string;
   submitLabel: string;
   loading: boolean;
@@ -28,281 +27,114 @@ type Props = {
 
 export default function TaskForm({
   initialTask,
+  members,
   ownerId,
   submitLabel,
   loading,
   error,
   onSubmit,
-}: Props) {
+}: TaskFormProps) {
   const [title, setTitle] = useState(initialTask?.title ?? "");
   const [description, setDescription] = useState(initialTask?.description ?? "");
   const [dueDate, setDueDate] = useState(
     initialTask?.dueDate ? initialTask.dueDate.split("T")[0] : ""
   );
-  const [status, setStatus] = useState<Task["status"] | null>(
-    initialTask?.status ?? null
+  const [status, setStatus] = useState<Task["status"]>(
+    initialTask?.status ?? "TODO"
   );
-
-  // 🟩 NOUVEAU : priorité
   const [priority, setPriority] = useState<Task["priority"]>(
     initialTask?.priority ?? "MEDIUM"
   );
-
-  const [assigneeOpen, setAssigneeOpen] = useState(false);
 
   const [selectedAssignees, setSelectedAssignees] = useState<User[]>(
     initialTask?.assignees?.map((a) => a.user) ?? []
   );
 
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    getUsers().then((users) => setAllUsers(users));
-  }, []);
-
-  function addAssignee(user: User) {
-    setSelectedAssignees((prev) =>
-      prev.some((u) => u.id === user.id) ? prev : [...prev, user]
-    );
-    setAssigneeOpen(false);
-  }
-
-  function removeAssignee(userId: string) {
-    setSelectedAssignees((prev) => prev.filter((u) => u.id !== userId));
-  }
-
   async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!status) return;
-
-  const assigneeIds = selectedAssignees.map((u) => u.id);
-
-  // 🔒 Sécurisation de la date
-  const isoDate =
-    dueDate && dueDate.trim() !== ""
-      ? new Date(dueDate).toISOString()
-      : null;
-
-  console.log("PAYLOAD =", {
-    title,
-    description,
-    dueDate: isoDate,
-    assigneeIds,
-    status,
-    priority,
-  });
-
-  await onSubmit(
-    title,
-    description,
-    isoDate ?? "", // ton onSubmit attend une string, donc "" si pas de date
-    assigneeIds,
-    status,
-    priority
-  );
-}
-
-  const availableUsers = allUsers.filter(
-    (u) => !selectedAssignees.some((a) => a.id === u.id)
-  );
-
+    await onSubmit(
+      title,
+      description,
+      dueDate,
+      selectedAssignees.map((u) => u.id),
+      status,
+      priority
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-
       <div className="w-113 h-133.75 mx-auto overflow-y-auto flex flex-col gap-4 pr-1">
 
         {/* Titre */}
         <div className="flex flex-col gap-1">
-          <label htmlFor="task-title" className="text-sm text-text-primary">
-            Titre <span aria-hidden="true">*</span>
-          </label>
+          <label className="text-sm text-text-primary">Titre *</label>
           <input
-            id="task-title"
+            aria-label="Titre de la tâche"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3 text-sm text-text-primary bg-bg-content transition"
-            placeholder="Titre de la tâche"
-            aria-required="true"
+            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3"
             required
-            autoFocus
           />
         </div>
 
         {/* Description */}
         <div className="flex flex-col gap-1">
-          <label htmlFor="task-description" className="text-sm text-text-primary">
-            Description <span aria-hidden="true">*</span>
-          </label>
+          <label className="text-sm text-text-primary">Description *</label>
           <textarea
-            id="task-description"
+            aria-label="Description de la tâche"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3 text-sm text-text-primary bg-bg-content transition resize-none"
-            placeholder="Description de la tâche"
-            rows={3}
-            aria-required="true"
+            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3 resize-none"
             required
           />
         </div>
 
         {/* Échéance */}
         <div className="flex flex-col gap-1">
-          <label htmlFor="task-due-date" className="text-sm text-text-primary">
-            Échéance <span aria-hidden="true">*</span>
-          </label>
-          <div className="relative">
-            <input
-              id="task-due-date"
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="h-13.25 w-full border border-system-neutral rounded-sm px-4 py-3 pr-11 text-sm text-text-primary bg-bg-content transition "
-              aria-required="true"
-              required
-            />           
-          </div>
+          <label className="text-sm text-text-primary">Échéance *</label>
+          <input
+            aria-label="Date d'échéance"
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3"
+            required
+          />
         </div>
 
-        {/* Assigné à */}
+        {/* Assignés */}
         <div className="flex flex-col gap-1">
-          <span id="assignee-label" className="text-sm text-text-primary">
-            Assigné à
-          </span>
+          <span className="text-sm text-text-primary">Assigné à</span>
 
-          {selectedAssignees.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-1">
-              {selectedAssignees.map((u) => (
-                <div key={u.id} className="flex items-center gap-1.5 bg-bg-grey-light rounded-full px-2 py-1">
-                  <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                      u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
-                    }`}
-                  >
-                    <span
-                      className={`text-[10px] ${
-                        u.id === ownerId ? "text-text-primary" : "text-text-secondary"
-                      }`}
-                    >
-                      {getInitials(u.name)}
-                    </span>
-                  </div>
-
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full ${
-                      u.id === ownerId
-                        ? "bg-brand-light text-text-primary"
-                        : "bg-bg-grey-border text-text-secondary"
-                    }`}
-                  >
-                    {u.name}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => removeAssignee(u.id)}
-                    className="text-text-secondary hover:text-system-error text-xs ml-0.5"
-                    aria-label={`Retirer ${u.name}`}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="relative">
-            <button
-              type="button"
-              role="combobox"
-              aria-haspopup="listbox"
-              aria-expanded={assigneeOpen}
-              aria-labelledby="assignee-label"
-              aria-controls="assignee-listbox"
-              onClick={() => setAssigneeOpen((v) => !v)}
-              className="w-full h-13.25 flex items-center justify-between border border-system-neutral rounded-[8px] px-4 py-3 text-sm bg-bg-content transition"
-            >
-              <span className="text-text-secondary">
-                {selectedAssignees.length > 0
-                  ? `${selectedAssignees.length} collaborateur${selectedAssignees.length > 1 ? "s" : ""}`
-                  : "Choisir un ou plusieurs collaborateurs"}
-              </span>
-
-              <svg
-                className={`h-7 w-7 text-text-secondary transition-transform ${
-                  assigneeOpen ? "rotate-180" : ""
-                }`}
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 8l5 5 5-5" />
-              </svg>
-            </button>
-
-            {assigneeOpen && availableUsers.length > 0 && (
-              <div
-                id="assignee-listbox"
-                role="listbox"
-                className="absolute top-full left-0 right-0 z-50 bg-bg-content border border-system-neutral rounded-[8px] shadow-modal mt-1 overflow-hidden max-h-48 overflow-y-auto"
-              >
-                {availableUsers.map((u) => (
-                  <button
-                    key={u.id}
-                    role="option"
-                    aria-selected={selectedAssignees.some((a) => a.id === u.id)}
-                    type="button"
-                    onClick={() => addAssignee(u)}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-text-secondary hover:bg-bg-grey-light transition"
-                  >
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                        u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
-                      }`}
-                    >
-                      <span
-                        className={`text-[9px] font-semibold ${
-                          u.id === ownerId ? "text-text-primary" : "text-text-secondary"
-                        }`}
-                      >
-                        {getInitials(u.name)}
-                      </span>
-                    </div>
-
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-sm ${
-                        u.id === ownerId
-                          ? "bg-brand-light text-text-primary"
-                          : "bg-bg-grey-border text-text-secondary"
-                      }`}
-                    >
-                      {u.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <MemberSearch
+            users={members.map((m) => m.user)}
+            selectedUsers={selectedAssignees}
+            onAdd={(u) => setSelectedAssignees((prev) => [...prev, u])}
+            onRemove={(id) =>
+              setSelectedAssignees((prev) => prev.filter((u) => u.id !== id))
+            }
+            ownerId={ownerId}
+            buttonLabel={
+              selectedAssignees.length > 0
+                ? `${selectedAssignees.length} assigné(s)`
+                : "Choisir des assignés"
+            }
+          />
         </div>
 
         {/* Statut */}
         <div className="flex flex-col gap-1">
           <span className="text-sm text-text-primary">Statut</span>
-          <div className="flex gap-2 flex-wrap" role="group" aria-label="Statut de la tâche">
+          <div className="flex gap-2 flex-wrap">
             {statusOptions.map(([value, label]) => (
               <button
                 key={value}
                 type="button"
-                onClick={() => {
-  console.log("CLICK → nouveau statut :", value);
-  setStatus(value);
-}}
-
-                aria-pressed={status === value}
-                className={`px-3 py-1.5 rounded-full text-xs transition mt-1 ${
+                onClick={() => setStatus(value)}
+                className={`px-3 py-1.5 rounded-full text-xs ${
                   status === value
                     ? "bg-system-info text-text-info"
                     : statusColor[value]
@@ -317,12 +149,12 @@ export default function TaskForm({
         {/* Priorité */}
         <div className="flex flex-col gap-1">
           <span className="text-sm text-text-primary">Priorité</span>
-
           <select
+            id="task-priority"
+            aria-label="Sélectionner la priorité"
             value={priority}
             onChange={(e) => setPriority(e.target.value as Task["priority"])}
-            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3 text-sm text-text-primary bg-bg-content transition"
-            aria-label="Sélectionner la priorité"
+            className="h-13.25 border border-system-neutral rounded-sm px-4 py-3"
           >
             <option value="URGENT">Urgente</option>
             <option value="HIGH">Haute</option>
@@ -331,25 +163,16 @@ export default function TaskForm({
           </select>
         </div>
 
+        {error && <p className="text-sm text-system-error">{error}</p>}
 
-        {error && (
-          <p role="alert" aria-live="assertive" className="text-sm text-system-error">
-            {error}
-          </p>
-        )}
-
-        <div className="mt-4">
-          <button
-            type="submit"
-            disabled={loading || !title.trim() || !description.trim() || !dueDate || !status}
-            className="w-45.25 h-12.5 bg-system-neutral text-text-neutral text-base rounded-[8px] hover:border border-brand-dark hover:bg-bg-content hover:text-brand-dark transition disabled:opacity-50"
-          >
-            {loading ? "En cours..." : submitLabel}
-          </button>
-        </div>
-
+        <button
+          type="submit"
+          disabled={loading || !title || !description || !dueDate}
+          className="w-45.25 h-12.5 bg-system-neutral rounded-[8px]"
+        >
+          {loading ? "En cours..." : submitLabel}
+        </button>
       </div>
-
     </form>
   );
 }

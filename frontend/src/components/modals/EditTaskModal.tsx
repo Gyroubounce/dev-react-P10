@@ -6,8 +6,8 @@ import TaskForm from "@/components/forms/TaskForm";
 import type { Task, ProjectMember } from "@/types/index";
 
 type Props = {
+  task: Task;
   members: ProjectMember[];
-  initialTask?: Partial<Task>;
   ownerId?: string;
   onClose: () => void;
   onSubmit: (
@@ -18,11 +18,12 @@ type Props = {
     status: Task["status"],
     priority: Task["priority"]
   ) => Promise<void>;
+
 };
 
-export default function CreateTaskModal({
+export default function EditTaskModal({
+  task,
   members,
-  initialTask,
   ownerId,
   onClose,
   onSubmit,
@@ -64,23 +65,22 @@ export default function CreateTaskModal({
     }
   }
 
-  const isEdit = !!initialTask;
-
   return (
     <BaseModal
-      id="task-modal-title"
-      title={isEdit ? "Modifier" : "Créer une tâche"}
+      id="edit-task-modal-title"
+      title="Modifier la tâche"
       onClose={onClose}
     >
       <TaskForm
-        members={members}   // 🔥 indispensable
-        initialTask={initialTask}
+        initialTask={task}
+        members={members}
         ownerId={ownerId}
-        submitLabel={isEdit ? "Enregistrer" : "+ Ajouter une tâche"}
+        submitLabel="Enregistrer"
         loading={loading}
         error={error}
         onSubmit={handleSubmit}
       />
+
     </BaseModal>
   );
 }

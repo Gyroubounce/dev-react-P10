@@ -11,9 +11,9 @@ type Props = {
   initialName: string;
   initialDescription: string;
   initialMembers: ProjectMember[];
-  ownerId: string; // 
-  uniqueContributors: User[];
-  totalContributors: number;
+  ownerId: string;
+  projectContributors: User[];   // 🔹 remplacé uniqueContributors
+  totalContributors: number;     // 🔹 toujours utile pour l’affichage
   onClose: () => void;
   onSubmit: (name: string, description: string) => Promise<void>;
   onAddContributor: (email: string) => Promise<void>;
@@ -27,7 +27,7 @@ export default function EditProjectModal({
   initialDescription,
   initialMembers,
   ownerId,
-  uniqueContributors,
+  projectContributors,
   totalContributors,
   onClose,
   onSubmit,
@@ -54,7 +54,7 @@ export default function EditProjectModal({
     }
   }
 
-  // ✅ Reçoit un User complet
+  // 🔹 Ajout d’un contributeur via ContributorSearch
   async function handleAddContributor(user: User) {
     try {
       await onAddContributor(user.email);
@@ -64,7 +64,7 @@ export default function EditProjectModal({
     }
   }
 
-  // ✅ Retire aussi du state local
+  // 🔹 Suppression d’un contributeur
   async function handleRemoveContributor(userId: string) {
     try {
       await onRemoveContributor(userId);
@@ -74,14 +74,13 @@ export default function EditProjectModal({
     }
   }
 
-
   return (
     <BaseModal id="edit-project-title" title="Modifier un projet" onClose={onClose}>
       <ProjectForm
         initialName={initialName}
         initialDescription={initialDescription}
         initialMembers={initialMembers}
-        uniqueContributors={uniqueContributors}
+        projectContributors={projectContributors}   // 🔹 cohérent avec ProjectDetailPage
         totalContributors={totalContributors}
         submitLabel="Enregistrer"
         loading={loading}
@@ -95,7 +94,7 @@ export default function EditProjectModal({
         onDelete={() => setDeleteOpen(true)}
       />
 
-         {deleteOpen && (
+      {deleteOpen && (
         <ModalProjectDelete
           onClose={() => setDeleteOpen(false)}
           onConfirm={async () => {

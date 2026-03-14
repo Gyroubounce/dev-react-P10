@@ -9,10 +9,14 @@ export async function fetchProject(projectId: string) {
   return apiRequest<{ project: Project }>(`/projects/${projectId}`);
 }
 
-export async function createProject(name: string, description: string) {
+export async function createProject(
+  name: string, 
+  description: string,
+  contributors?: string[]  // ✅ Ajouter ce paramètre
+) {
   return apiRequest<{ project: Project }>("/projects", {
     method: "POST",
-    body: { name, description },
+    body: { name, description, contributors },  // ✅ Inclure contributors
   });
 }
 

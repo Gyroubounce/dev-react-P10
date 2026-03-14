@@ -9,33 +9,34 @@ import type { User } from "@/types/index";
 import Button from "@/components/ui/Button";
 
 export default function ProjectsPage() {
-  const { projects, loading, error, fetchProjects, createProject, addContributor } = useProjects();
+  const { projects, loading, error, fetchProjects, createProject} = useProjects();
   const { isOpen, openModal, closeModal } = useModal();
 
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
-  async function handleCreateProject(
-    name: string,
-    description: string,
-    contributors: User[]
-  ) {
-    try {
-    const projectId = await createProject(name, description);
+ async function handleCreateProject(
+  name: string,
+  description: string,
+  contributors: User[]
+) {
+  try {
+    // ✅ Extraire les emails
+    const contributorEmails = contributors.map(u => u.email);
+    
+    // ✅ Passer les emails à createProject
+    const projectId = await createProject(name, description, contributorEmails);
+    
     if (!projectId) return;
-
-    await Promise.all(
-      contributors.map((user) => addContributor(projectId, user.email))
-    );
-
+    
+    // ✅ Rafraîchir
     await fetchProjects();
-    } catch (error) {
+  } catch (error) {
     console.error("Erreur lors de la création du projet:", error);
-    throw error; // Pour que CreateProjectModal affiche l'erreur
+    throw error;
   }
-  }
-
+}
   return (
     <div className="flex flex-col gap-8">
 

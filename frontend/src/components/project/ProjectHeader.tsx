@@ -4,7 +4,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { getInitials } from "@/lib/utils/initials";
 import Button from "@/components/ui/Button";
 import IAIcon from "@/components/ui/icons/IAIcon";
-import type { Project, Task, User } from "@/types";
+import type { Project, User } from "@/types";
 
 type ProjectHeaderProps = {
   project: Project;
@@ -24,6 +24,91 @@ export default function ProjectHeader({
   onCreateTask,
   onCreateAITask,
 }: ProjectHeaderProps) {
+
+  // 🔹 Propriétaire
+  const owner = project.owner;
+
+  // 🔹 Contributeurs EXACTEMENT comme MemberSearch
+  const contributors: User[] = project.members.map((m) => m.user);
+
+  // 🔥🔥🔥 AUDIT COMPLET DES DONNÉES 🔥🔥🔥
+// 🔥🔥🔥 AUDIT COMPLET DU PROJET 🔥🔥🔥
+console.group("🔍 AUDIT PROJECT HEADER");
+
+// Projet
+console.log("📌 Projet :", project.name, "(", project.id, ")");
+
+// Owner
+console.log("👤 Owner :", {
+  id: owner.id,
+  name: owner.name,
+  email: owner.email,
+});
+
+// Contributeurs du projet
+console.log("👥 Members du projet :", contributors.map((u) => ({
+  id: u.id,
+  name: u.name,
+  email: u.email,
+})));
+
+console.log("📊 Nombre de membres :", contributors.length);
+
+// Tâches
+console.log("📝 Nombre total de tâches :", project.tasks.length);
+
+// Liste des tâches
+console.log(
+  "📄 Liste des tâches :",
+  project.tasks.map((t) => ({
+    id: t.id,
+    title: t.title,
+  }))
+);
+
+// Audit par tâche
+project.tasks.forEach((task) => {
+  console.group(`   ➤ Tâche : ${task.title} (${task.id})`);
+
+  // Assignees
+  const assignees = task.assignees.map((a) => ({
+    id: a.user.id,
+    name: a.user.name,
+    email: a.user.email,
+  }));
+
+  console.log("   👤 Assignees :", assignees);
+  console.log("   🔢 Nombre d’assignees :", assignees.length);
+
+  // Vérification : owner ∈ assignees ?
+  const ownerInAssignees = assignees.some((a) => a.id === owner.id);
+  console.log(
+    ownerInAssignees
+      ? "   ✔ Owner est assigné à cette tâche"
+      : "   ❌ Owner n'est PAS assigné à cette tâche"
+  );
+
+  // Vérification : assignees ∈ project.members ?
+  const memberIds = contributors.map((u) => u.id);
+  const invalidAssignees = assignees.filter(
+    (a) => !memberIds.includes(a.id)
+  );
+
+  if (invalidAssignees.length > 0) {
+    console.warn("   ⚠️ Assignees NON membres du projet :", invalidAssignees);
+  } else {
+    console.log("   ✔ Tous les assignees sont membres du projet");
+  }
+
+  console.groupEnd();
+});
+
+
+// 🔥🔥🔥 FIN AUDIT 🔥🔥🔥
+
+
+
+
   return (
     <div className="flex flex-col gap-6">
 
@@ -98,62 +183,46 @@ export default function ProjectHeader({
           >
             Contributeurs{" "}
             <span className="text-base text-text-secondary ml-1">
-              {(() => {
-                const uniqueTaskContributors = new Set<string>();
-
-                project.tasks?.forEach((task: Task) => {
-                  task.assignees?.forEach((assignee) => {
-                    if (assignee.user.id !== project.owner.id) {
-                      uniqueTaskContributors.add(assignee.user.id);
-                    }
-                  });
-                });
-
-                return uniqueTaskContributors.size + 1;
-              })()}{" "}
-              personnes
+              {contributors.length} personnes
             </span>
           </h2>
 
           <ul className="flex flex-row flex-wrap gap-3" aria-label="Liste des contributeurs">
 
-            {/* Propriétaire */}
-            <li className="flex items-center gap-2">
-              <div className="w-6.75 h-6.75 rounded-full bg-brand-light flex items-center justify-center shrink-0">
-                <span className="text-[10px] text-text-btn-black">
-                  {getInitials(project.owner.name)}
-                </span>
-              </div>
-              <span className="text-sm text-brand-dark bg-brand-light px-2 py-0.5 rounded-full">
-                Propriétaire
-              </span>
-            </li>
+            {contributors.map((user) => (
+              <li key={user.id} className="flex items-center gap-2">
 
-            {/* Contributeurs uniques */}
-            {(() => {
-              const uniqueContributors: User[] = Array.from(
-                new Map<string, User>(
-                  project.tasks?.flatMap((task: Task) =>
-                    task.assignees
-                      ?.filter((a) => a.user.id !== project.owner.id)
-                      .map((a) => [a.user.id, a.user]) || []
-                  ) || []
-                ).values()
-              );
-
-              return uniqueContributors.map((user: User) => (
-                <li key={user.id} className="flex items-center gap-2">
-                  <div className="w-6.75 h-6.75 rounded-full bg-bg-grey-border flex items-center justify-center shrink-0">
-                    <span className="text-[10px] text-text-secondary">
-                      {getInitials(user.name)}
-                    </span>
-                  </div>
-                  <span className="text-sm text-text-secondary bg-bg-grey-border px-2 py-0.5 rounded-full">
-                    {user.name}
+                {/* Avatar */}
+                <div
+                  className={`w-6.75 h-6.75 rounded-full flex items-center justify-center shrink-0 ${
+                    user.id === owner.id ? "bg-brand-light" : "bg-bg-grey-border"
+                  }`}
+                >
+                  <span
+                    className={`text-[10px] ${
+                      user.id === owner.id
+                        ? "text-text-primary"
+                        : "text-text-secondary"
+                    }`}
+                  >
+                    {getInitials(user.name)}
                   </span>
-                </li>
-              ));
-            })()}
+                </div>
+
+                {/* Label */}
+                <span
+                  className={`text-sm px-2 py-0.5 rounded-full ${
+                    user.id === owner.id
+                      ? "bg-brand-light text-brand-dark"
+                      : "bg-bg-grey-border text-text-secondary"
+                  }`}
+                >
+                  {user.id === owner.id ? "Propriétaire" : user.name}
+                </span>
+
+              </li>
+            ))}
+
           </ul>
         </div>
       </section>

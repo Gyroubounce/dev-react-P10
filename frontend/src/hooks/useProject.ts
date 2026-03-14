@@ -15,11 +15,43 @@ import {
   deleteTask as apiDeleteTask,
 } from "@/lib/api/tasks";
 
-import type { Project, Task } from "@/types/index";
+import type { Project, Task, ProjectMember } from "@/types/index";
 
 export type ProjectDetail = Project & {
   tasks: Task[];
 };
+
+// ---------------------------------------------------------
+// 🔥 1) OWNER TOUJOURS DANS LES MEMBERS
+// ---------------------------------------------------------
+function ensureOwnerInMembers(project: Project): ProjectMember[] {
+  const owner = project.owner;
+  const members = project.members ?? [];
+
+  const hasOwner = members.some((m) => m.user.id === owner.id);
+  if (hasOwner) return members;
+
+  const ownerMember: ProjectMember = {
+    id: `owner-${owner.id}`,
+    user: owner,
+    role: members[0]?.role ?? "CONTRIBUTOR", // rôle fallback
+    joinedAt: project.createdAt ?? new Date().toISOString(),
+  };
+
+  return [ownerMember, ...members];
+}
+
+// ---------------------------------------------------------
+// 🔥 2) ASSIGNEES TOUJOURS VALIDES
+// ---------------------------------------------------------
+function sanitizeTaskAssignees(tasks: Task[], members: ProjectMember[]): Task[] {
+  const memberIds = members.map((m) => m.user.id);
+
+  return tasks.map((task) => ({
+    ...task,
+    assignees: task.assignees.filter((a) => memberIds.includes(a.user.id)),
+  }));
+}
 
 export function useProject(projectId: string) {
   const [project, setProject] = useState<ProjectDetail | null>(null);
@@ -43,9 +75,16 @@ export function useProject(projectId: string) {
 
     const { data: taskData } = await fetchProjectTasks(projectId);
 
+    // 1) Owner toujours dans les membres
+    const safeMembers = ensureOwnerInMembers(projectData.project);
+
+    // 2) Assignees toujours valides
+    const safeTasks = sanitizeTaskAssignees(taskData?.tasks ?? [], safeMembers);
+
     setProject({
       ...projectData.project,
-      tasks: taskData?.tasks ?? [],
+      members: safeMembers,
+      tasks: safeTasks,
     });
 
     setLoading(false);
@@ -103,20 +142,31 @@ export function useProject(projectId: string) {
     );
 
     if (err) throw new Error(err);
+
     await fetchProject();
   }
 
   // ---------------------------------------------------------
-  // UPDATE TASK STATUS ONLY
+  // UPDATE TASK STATUS
   // ---------------------------------------------------------
   async function updateTaskStatus(taskId: string, status: Task["status"]): Promise<void> {
     const { error: err } = await apiUpdateTask(projectId, taskId, { status });
     if (err) throw new Error(err);
-    await fetchProject();
+
+    setProject((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        tasks: prev.tasks.map((t) =>
+          t.id === taskId ? { ...t, status } : t
+        ),
+      };
+    });
   }
 
   // ---------------------------------------------------------
-  // UPDATE FULL TASK (title, desc, date, assignees, status, priority)
+  // UPDATE FULL TASK
   // ---------------------------------------------------------
   async function updateTask(
     taskId: string,
@@ -126,9 +176,20 @@ export function useProject(projectId: string) {
       }
     >
   ): Promise<void> {
+
     const { error: err } = await apiUpdateTask(projectId, taskId, data);
     if (err) throw new Error(err);
-    await fetchProject();
+
+    setProject((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        tasks: prev.tasks.map((t) =>
+          t.id === taskId ? { ...t, ...data } : t
+        ),
+      };
+    });
   }
 
   // ---------------------------------------------------------
@@ -137,12 +198,17 @@ export function useProject(projectId: string) {
   async function deleteTask(taskId: string): Promise<void> {
     const { error: err } = await apiDeleteTask(projectId, taskId);
     if (err) throw new Error(err);
-    await fetchProject();
+
+    setProject((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        tasks: prev.tasks.filter((t) => t.id !== taskId),
+      };
+    });
   }
 
-  // ---------------------------------------------------------
-  // EXPORT HOOK API
-  // ---------------------------------------------------------
   return {
     project,
     loading,
@@ -153,7 +219,7 @@ export function useProject(projectId: string) {
     removeContributor,
     createTask,
     updateTaskStatus,
-    updateTask,     // 🟩 AJOUTÉ
+    updateTask,
     deleteTask,
   };
 }

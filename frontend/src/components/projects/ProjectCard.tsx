@@ -10,28 +10,14 @@ type Props = {
 export default function ProjectCard({ project }: Props) {
   const owner = project.owner;
 
-  // ✅ Récupérer tous les contributeurs uniques des tâches
-  const allTaskContributors = new Set<string>();
-  project.tasks?.forEach((task) => {
-    task.assignees?.forEach((assignee) => {
-      allTaskContributors.add(assignee.user.id);
-    });
-  });
+  // 🔹 Contributeurs du projet (hors propriétaire)
+  const projectContributors =
+    project.members?.filter((m) => m.user.id !== owner.id).map((m) => m.user) ||
+    [];
 
-  // ✅ Ajouter le propriétaire
-  const totalContributors = allTaskContributors.size + 1; // +1 pour le owner
+  // 🔹 Total = propriétaire + contributeurs
+  const totalContributors = 1 + projectContributors.length;
 
-  // ✅ Récupérer les objets User uniques
-  const uniqueContributors = Array.from(
-    new Map(
-      project.tasks?.flatMap((task) => 
-        task.assignees?.map((a) => [a.user.id, a.user]) || []
-      ) || []
-    ).values()
-  );
-
-
-  
   return (
     <Link
       href={`/dashboard/projects/${project.id}`}
@@ -63,19 +49,19 @@ export default function ProjectCard({ project }: Props) {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`Progression du projet : ${project.progression}%`}
-          >
+        >
           <div
-            className="h-full  bg-brand-dark rounded-full transition-all"
+            className="h-full bg-brand-dark rounded-full transition-all"
             style={{ width: `${project.progression}%` }}
-            />
-          </div>
-
-          <span className="text-xs text-text-secondary">
-            {project.completedTasks}/{project.totalTasks} tâches terminées
-          </span>
+          />
         </div>
 
-      
+        <span className="text-xs text-text-secondary">
+          {project.completedTasks}/{project.totalTasks} tâches terminées
+        </span>
+      </div>
+
+      {/* Équipe */}
       <div className="flex flex-col gap-2">
         <span className="flex gap-1 text-[10px] font-medium text-text-secondary">
           <EquipeIcon className="w-3 h-3" />
@@ -100,26 +86,22 @@ export default function ProjectCard({ project }: Props) {
             </span>
           </div>
 
-       {/* Contributeurs uniques des tâches (hors propriétaire) */}
-      {uniqueContributors
-        .filter((user) => user.id !== owner.id)
-        .map((user) => (
-          <div
-            key={user.id}
-            className="w-7 h-7 rounded-full bg-bg-grey-border flex items-center justify-center"
-            aria-label={user.name}
-            title={user.name}
-          >
-            <span className="text-[10px] text-text-secondary">
-              {getInitials(user.name)}
-            </span>
-          </div>
-        ))}
-
+          {/* Contributeurs du projet */}
+          {projectContributors.map((user) => (
+            <div
+              key={user.id}
+              className="w-7 h-7 rounded-full bg-bg-grey-border flex items-center justify-center"
+              aria-label={user.name}
+              title={user.name}
+            >
+              <span className="text-[10px] text-text-secondary">
+                {getInitials(user.name)}
+              </span>
+            </div>
+          ))}
 
         </div>
       </div>
-
     </Link>
   );
 }

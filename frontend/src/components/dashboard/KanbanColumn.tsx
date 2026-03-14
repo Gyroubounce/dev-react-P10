@@ -1,7 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import TaskCardKanban from "@/components/dashboard/TaskCardKanban";
-import type { TaskWithProject, Project } from "@/types/index"; // ✅ Ajouter import Project
+import type { TaskWithProject, Project } from "@/types/index";
 
 type Props = {
   id: TaskWithProject["status"];
@@ -12,11 +12,14 @@ type Props = {
 };
 
 export default function KanbanColumn({ id, title, tasks, projects, onEdit }: Props) {
+  // 🔥 Sécurisation absolue
+  const safeTasks = tasks ?? [];
+
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <section
-      aria-label={`Colonne ${title} — ${tasks.length} tâche${tasks.length > 1 ? "s" : ""}`}
+      aria-label={`Colonne ${title} — ${safeTasks.length} tâche${safeTasks.length > 1 ? "s" : ""}`}
       className="flex flex-col gap-3 w-93.75"
     >
       <div className="flex items-center gap-2 px-1">
@@ -25,9 +28,9 @@ export default function KanbanColumn({ id, title, tasks, projects, onEdit }: Pro
         </h3>
         <span
           className="text-xs font-medium bg-bg-grey-light text-text-secondary px-2 py-0.5 rounded-full"
-          aria-label={`${tasks.length} tâche${tasks.length > 1 ? "s" : ""}`}
+          aria-label={`${safeTasks.length} tâche${safeTasks.length > 1 ? "s" : ""}`}
         >
-          {tasks.length}
+          {safeTasks.length}
         </span>
       </div>
 
@@ -38,26 +41,25 @@ export default function KanbanColumn({ id, title, tasks, projects, onEdit }: Pro
         }`}
       >
         <SortableContext
-          items={tasks.map((t) => t.id)}
+          items={safeTasks.map((t) => t.id)}
           strategy={verticalListSortingStrategy}
         >
           <ul className="flex flex-col gap-3">
-            {tasks.length === 0 ? (
+            {safeTasks.length === 0 ? (
               <li className="text-xs text-text-secondary text-center mt-6">
                 Aucune tâche
               </li>
             ) : (
-              tasks.map((task) => {
-                // ✅ Récupérer l'ownerId pour chaque tâche
+              safeTasks.map((task) => {
                 const taskProject = projects.find((p) => p.id === task.projectId);
                 const taskOwnerId = taskProject?.owner?.id;
 
                 return (
                   <li key={task.id}>
-                    <TaskCardKanban 
-                      task={task} 
-                      ownerId={taskOwnerId} // ✅ Passer ownerId
-                      onEdit={onEdit} 
+                    <TaskCardKanban
+                      task={task}
+                      ownerId={taskOwnerId}
+                      onEdit={onEdit}
                     />
                   </li>
                 );
@@ -66,7 +68,6 @@ export default function KanbanColumn({ id, title, tasks, projects, onEdit }: Pro
           </ul>
         </SortableContext>
       </div>
-
     </section>
   );
 }

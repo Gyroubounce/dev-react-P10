@@ -79,6 +79,13 @@ export default function TasksSection({
     })
   );
 
+  // 🔥 Fonction d’édition
+  function handleEdit(task: TaskWithProject) {
+    setEditingTask(task);
+    openModal("editTask");
+  }
+
+  // 🔥 Drag & drop
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over) return;
@@ -96,12 +103,7 @@ export default function TasksSection({
     }
   }
 
-  function handleEdit(task: TaskWithProject) {
-    setEditingTask(task);
-    openModal("editTask");
-  }
-
-  // Récupérer le projet de la tâche en cours d'édition
+  // 🔥 Récupération du projet de la tâche éditée
   const editingTaskProject = projects.find((p) => p.id === editingTask?.projectId);
   const editingTaskMembers: ProjectMember[] = editingTaskProject?.members ?? [];
   const editingTaskOwnerId = editingTaskProject?.owner?.id;
@@ -110,7 +112,7 @@ export default function TasksSection({
     <section aria-labelledby="tasks-title">
       <div className="bg-bg-content rounded-[8px] shadow-card px-6 py-5 flex flex-col gap-6">
 
-        {/* En-tête */}
+        {/* Filtres */}
         <div className="flex items-center justify-between flex-wrap gap-3 my-3">
           <div className="flex flex-col gap-0.5">
             <h2 id="tasks-title" className="text-[18px] font-semibold text-text-primary">
@@ -121,10 +123,11 @@ export default function TasksSection({
 
           <div className="flex items-center gap-3 flex-wrap">
             <select
+              title="Filtrer par statut"
+              aria-label="Filtrer par statut"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
               className="text-sm border border-system-neutral rounded-[8px] px-3 py-2 bg-bg-content text-text-primary transition"
-              aria-label="Filtrer par statut"
             >
               <option value="ALL">Tous les statuts</option>
               <option value="TODO">À faire</option>
@@ -134,10 +137,11 @@ export default function TasksSection({
             </select>
 
             <select
+              title="Filtrer par priorité"
+              aria-label="Filtrer par priorité"
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value as typeof filterPriority)}
               className="text-sm border border-system-neutral rounded-[8px] px-3 py-2 bg-bg-content text-text-primary transition"
-              aria-label="Filtrer par priorité"
             >
               <option value="ALL">Toutes les priorités</option>
               <option value="URGENT">Urgente</option>
@@ -153,50 +157,28 @@ export default function TasksSection({
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher une tâche"
                 className="pl-4 pr-4 py-2 text-sm border border-system-neutral rounded-[8px] bg-bg-content text-text-primary w-56 transition"
-                aria-label="Rechercher une tâche"
               />
               <MagnifyingGlassIcon
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
-                aria-hidden="true"
               />
             </div>
           </div>
         </div>
 
-        {/* États */}
-        {loading && (
-          <p role="status" aria-live="polite" className="text-sm text-text-secondary py-4">
-            Chargement des tâches...
-          </p>
-        )}
-
-        {!loading && error && (
-          <p role="alert" aria-live="assertive" className="text-sm text-system-error py-4">
-            {error}
-          </p>
-        )}
-
-        {!loading && !error && filteredTasks.length === 0 && (
-          <p className="text-sm text-text-secondary py-4">
-            Aucune tâche assignée pour le moment.
-          </p>
-        )}
-
         {/* Vue Liste */}
         {!loading && !error && view === "list" && filteredTasks.length > 0 && (
-          <div className="flex flex-col gap-3" role="list" aria-label="Liste des tâches">
+          <div className="flex flex-col gap-3">
             {filteredTasks.map((task) => {
               const taskProject = projects.find((p) => p.id === task.projectId);
               const taskOwnerId = taskProject?.owner?.id;
 
               return (
-                <div key={task.id} role="listitem">
-                  <TaskCardList
-                    task={task}
-                    ownerId={taskOwnerId}
-                    onEdit={handleEdit}
-                  />
-                </div>
+                <TaskCardList
+                  key={task.id}
+                  task={task}
+                  ownerId={taskOwnerId}
+                  onEdit={handleEdit}   // 🔥 opérationnel
+                />
               );
             })}
           </div>
@@ -209,16 +191,17 @@ export default function TasksSection({
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex gap-4 items-start mt-4 pb-4" role="region" aria-label="Vue Kanban">
+            <div className="flex gap-4 items-start mt-4 pb-4">
               {COLUMNS.map((col) => (
                 <KanbanColumn
                   key={col.id}
                   id={col.id}
                   title={col.label}
-                  tasks={filteredTasks.filter((t) => t.status === col.id)}
+                  tasks={filteredTasks?.filter((t) => t.status === col.id) ?? []}
                   projects={projects}
                   onEdit={handleEdit}
                 />
+
               ))}
             </div>
           </DndContext>
@@ -226,7 +209,7 @@ export default function TasksSection({
 
       </div>
 
-      {/* Modale modifier tâche */}
+      {/* Modale d’édition */}
       {isOpen("editTask") && editingTask && (
         <CreateTaskModal
           members={editingTaskMembers}
@@ -240,11 +223,12 @@ export default function TasksSection({
             await updateTask(editingTask.id, {
               title,
               description,
-              dueDate,
+              dueDate: dueDate ?? undefined,
               assigneeIds,
               status,
               priority,
             });
+
 
             closeModal();
             setEditingTask(null);

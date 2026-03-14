@@ -5,31 +5,45 @@ export async function createTask(
   projectId: string,
   title: string,
   description: string,
-  dueDate: string,
+  dueDate: string | null,
   assigneeIds: string[],
-  status: Task["status"],
+  status: Task["status"],      // accepté mais ignoré par le backend
   priority: Task["priority"]
 ) {
   return apiRequest(`/projects/${projectId}/tasks`, {
     method: "POST",
-    body: { title, description, dueDate, assigneeIds, status, priority },
+    body: {
+      title,
+      description,
+      priority,
+      dueDate: dueDate || null,   // 🔥 conforme backend
+      assigneeIds,                // 🔥 IDs uniquement
+    },
   });
 }
+
 
 export async function updateTask(
   projectId: string,
   taskId: string,
-  data: Partial<
-    Pick<Task, "title" | "description" | "dueDate" | "status" | "priority"> & {
-      assigneeIds?: string[];
-    }
-  >
+  data: Partial<{
+    title: string;
+    description: string;
+    status: Task["status"];
+    priority: Task["priority"];
+    dueDate: string | null;
+    assigneeIds: string[];
+  }>
 ) {
   return apiRequest(`/projects/${projectId}/tasks/${taskId}`, {
-    method: "PUT",
-    body: data,
+    method: "PATCH",   // 🔥 conforme backend
+    body: {
+      ...data,
+      dueDate: data.dueDate || null,   // 🔥 conforme backend
+    },
   });
 }
+
 
 export async function deleteTask(projectId: string, taskId: string) {
   return apiRequest(`/projects/${projectId}/tasks/${taskId}`, {

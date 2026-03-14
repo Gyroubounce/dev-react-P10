@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth"; // ✅ Importer useAuth
 import BaseModal from "@/components/modals/BaseModal";
 import ProjectForm from "@/components/forms/ProjectForm";
 import type { User } from "@/types/index";
@@ -12,7 +11,6 @@ type Props = {
 };
 
 export default function CreateProjectModal({ onClose, onSubmit }: Props) {
-  const { user } = useAuth(); // ✅ Récupérer l'utilisateur connecté
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedContributors, setSelectedContributors] = useState<User[]>([]);
@@ -31,35 +29,35 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
     }
   }
 
-  function handleAddContributor(contributor: User) {
-    setSelectedContributors((prev) => [...prev, contributor]);
-  }
-
-  function handleRemoveContributor(userId: string) {
-    setSelectedContributors((prev) => prev.filter((u) => u.id !== userId));
-  }
-
-  console.log("Owner ID:", user?.id); // ✅ Déboguer
-
   return (
-    <BaseModal 
-    id="create-project-title" 
-    title="Créer un projet" 
-    onClose={onClose}>
-      
+    <BaseModal id="create-project-title" title="Créer un projet" onClose={onClose}>
       <ProjectForm
-        submitLabel="+ Créer le projet"
+        submitLabel="Créer"
         loading={loading}
         error={error}
         onSubmit={handleSubmit}
-        onAddContributor={handleAddContributor}
-        onRemoveContributor={handleRemoveContributor}
+
+        // 🔹 Pas de membres initiaux lors de la création
+        initialMembers={[]}
+
+        // 🔹 Aucun contributeur au début
+        projectContributors={selectedContributors}
+
+        // 🔹 Total = contributeurs sélectionnés + owner (owner sera ajouté après création)
+        totalContributors={selectedContributors.length}
+
+        // 🔹 Gestion des contributeurs
         selectedContributors={selectedContributors}
-        ownerId={user?.id} 
-        uniqueContributors = {selectedContributors}
-        totalContributors = {selectedContributors.length}
+        onAddContributor={(user) =>
+          setSelectedContributors((prev) => [...prev, user])
+        }
+        onRemoveContributor={(userId) =>
+          setSelectedContributors((prev) => prev.filter((u) => u.id !== userId))
+        }
+
+        // 🔹 Pas de suppression de projet ici
+        onDelete={() => {}}
       />
     </BaseModal>
   );
 }
-   

@@ -14,6 +14,7 @@ import ProjectTaskList from "@/components/project/ProjectTaskList";
 
 import EditProjectModal from "@/components/modals/EditProjectModal";
 import CreateTaskModal from "@/components/modals/CreateTaskModal";
+import EditTaskModal from "@/components/modals/EditTaskModal";
 import AITaskModal from "@/components/modals/AITaskModal";
 
 import type { Task } from "@/types";
@@ -69,18 +70,15 @@ export default function ProjectDetailPage() {
 
   const isOwner = project.owner.id === user?.id;
 
-  // Contributeurs uniques (hors propriétaire)
-  const uniqueContributors = Array.from(
-    new Map(
-      project.tasks?.flatMap((task) =>
-        task.assignees
-          ?.filter((a) => a.user.id !== project.owner.id)
-          .map((a) => [a.user.id, a.user]) || []
-      ) || []
-    ).values()
-  );
+  // 🔹 Contributeurs du projet (hors propriétaire)
+  const projectContributors =
+    project.members
+      ?.filter((m) => m.user.id !== project.owner.id)
+      .map((m) => m.user) || [];
 
-  const totalContributors = 1 + uniqueContributors.length;
+  // 🔹 Total = propriétaire + contributeurs
+  const totalContributors = 1 + projectContributors.length;
+
 
   // Filtrage + tri
   const filteredTasks = (project.tasks ?? [])
@@ -106,6 +104,31 @@ export default function ProjectDetailPage() {
       )
     );
   }
+
+  // ✅ HANDLER POUR MODIFIER UNE TÂCHE
+async function handleUpdateTask(
+  title: string,
+  description: string,
+  dueDate: string | null,
+  assigneeIds: string[],
+  status: Task["status"],
+  priority: Task["priority"]
+) {
+  if (!editingTask) return;
+
+  await updateTask(editingTask.id, {
+    title,
+    description,
+    dueDate: dueDate ?? undefined,
+    assigneeIds,
+    status,
+    priority,
+  });
+
+  closeModal();
+  setEditingTask(null);
+}
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -135,7 +158,8 @@ export default function ProjectDetailPage() {
         tasks={filteredTasks}
         ownerId={project.owner.id}
         onEditTask={(t: Task) => {
-          setEditingTask(t);
+          const fullTask = project.tasks.find((task) => task.id === t.id);
+          setEditingTask(fullTask || t);
           openModal("editTask");
         }}
         onDeleteTask={deleteTask}
@@ -151,7 +175,7 @@ export default function ProjectDetailPage() {
           initialDescription={project.description ?? ""}
           initialMembers={project.members}
           ownerId={project.owner.id}
-          uniqueContributors={uniqueContributors}
+          projectContributors={projectContributors}
           totalContributors={totalContributors}
           onClose={closeModal}
           onSubmit={updateProject}
@@ -170,35 +194,25 @@ export default function ProjectDetailPage() {
           ownerId={project.owner.id}
           onClose={closeModal}
           onSubmit={(title, description, dueDate, assigneeIds, status, priority) =>
-            createTask(title, description, dueDate, assigneeIds, status, priority)
+            createTask(title, description, dueDate ?? "", assigneeIds, status, priority)
           }
         />
       )}
 
-      {isOpen("editTask") && editingTask && (
-        <CreateTaskModal
-          members={project.members}
-          ownerId={project.owner.id}
-          initialTask={editingTask}
-          onClose={() => {
-            closeModal();
-            setEditingTask(null);
-          }}
-          onSubmit={async (title, description, dueDate, assigneeIds, status, priority) => {
-            await updateTask(editingTask.id, {
-              title,
-              description,
-              dueDate,
-              assigneeIds,
-              status,
-              priority,
-            });
+          {/* ÉDITION */}
+        {isOpen("editTask") && editingTask && (
+          <EditTaskModal
+            task={editingTask}
+            members={project.members}
+            ownerId={project.owner.id}
+            onClose={() => {
+              closeModal();
+              setEditingTask(null);
+            }}
+            onSubmit={handleUpdateTask}
 
-            closeModal();
-            setEditingTask(null);
-          }}
-        />
-      )}
+          />
+        )}
 
       {isOpen("aiTask") && (
         <AITaskModal onClose={closeModal} onSubmit={handleAISubmit} />

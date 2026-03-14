@@ -11,7 +11,7 @@ import Button from "@/components/ui/Button";
 type Props = {
   task: TaskWithProject;
   ownerId?: string;
-  onEdit: (task: TaskWithProject) => void;
+  onEdit?: (task: TaskWithProject) => void; // optionnel = parfait pour Dashboard
 };
 
 export default function TaskCardList({ task, onEdit }: Props) {
@@ -19,7 +19,6 @@ export default function TaskCardList({ task, onEdit }: Props) {
     <div
       className="bg-bg-content rounded-[8px] shadow-card px-7 flex items-start justify-between gap-4 border border-bg-grey-border"
       aria-label={`Tâche : ${task.title}`}
-      
     >
       <div className="flex flex-col gap-1 mt-4 mb-2 flex-1 min-w-0">
 
@@ -66,13 +65,21 @@ export default function TaskCardList({ task, onEdit }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col items-end mt-4  gap-5 shrink-0">
+      <div className="flex flex-col items-end mt-4 gap-5 shrink-0">
         <span className={`text-xs px-2 py-1 rounded-full ${statusColor[task.status]}`}>
           {statusLabel[task.status]}
         </span>
-        <Button variant="voir" onClick={() => onEdit(task)} ariaLabel={`Modifier la tâche ${task.title}`}>
-          Voir
-        </Button>
+
+        {/* Bouton Voir seulement si onEdit est fourni */}
+        {onEdit && (
+          <Button
+            variant="voir"
+            onClick={() => onEdit(task)}
+            ariaLabel={`Voir la tâche ${task.title}`}
+          >
+            Voir
+          </Button>
+        )}
       </div>
 
     </div>
