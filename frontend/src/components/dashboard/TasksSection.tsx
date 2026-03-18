@@ -122,44 +122,79 @@ export default function TasksSection({
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            <select
-              title="Filtrer par statut"
-              aria-label="Filtrer par statut"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
-              className="text-sm border border-system-neutral rounded-[8px] px-3 py-2 bg-bg-content text-text-primary transition"
-            >
-              <option value="ALL">Tous les statuts</option>
-              <option value="TODO">À faire</option>
-              <option value="IN_PROGRESS">En cours</option>
-              <option value="DONE">Terminées</option>
-              <option value="CANCELLED">Annulées</option>
-            </select>
+            <div className="relative inline-block w-35">
+              <select
+                title="Filtrer par statut"
+                aria-label="Filtrer par statut"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
+                className="appearance-none w-full text-sm border border-system-neutral rounded-[8px] px-3 py-2 h-15.75 bg-bg-content text-text-primary pr-8 focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              >
+                <option value="ALL">Tous les statuts</option>
+                <option value="TODO">À faire</option>
+                <option value="IN_PROGRESS">En cours</option>
+                <option value="DONE">Terminées</option>
+                <option value="CANCELLED">Annulées</option>
+              </select>
 
-            <select
-              title="Filtrer par priorité"
-              aria-label="Filtrer par priorité"
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value as typeof filterPriority)}
-              className="text-sm border border-system-neutral rounded-[8px] px-3 py-2 bg-bg-content text-text-primary transition"
-            >
-              <option value="ALL">Toutes les priorités</option>
-              <option value="URGENT">Urgente</option>
-              <option value="HIGH">Haute</option>
-              <option value="MEDIUM">Moyenne</option>
-              <option value="LOW">Basse</option>
-            </select>
+              {/* Chevron */}
+              <svg
+                className="w-4 h-4 text-text-secondary absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            
+
+            <div className="relative w-40">
+              <select
+                id="filter-priority"
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value as typeof filterPriority)}
+                className="text-sm border border-system-neutral rounded-[8px] px-3 h-15.75 bg-bg-content text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-brand-dark w-full"
+                aria-label="Filtrer par priorité"
+              >
+                <option value="ALL">Toutes les priorités</option>
+                <option value="URGENT">Urgente</option>
+                <option value="HIGH">Haute</option>
+                <option value="MEDIUM">Moyenne</option>
+                <option value="LOW">Basse</option>
+              </select>
+              {/* Icône personnalisée */}
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </div>
 
             <div className="relative">
+              <label htmlFor="task-search" className="sr-only">
+                Rechercher une tâche
+              </label>
               <input
+                id="task-search"
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher une tâche"
-                className="pl-4 pr-4 py-2 text-sm border border-system-neutral rounded-[8px] bg-bg-content text-text-primary w-56 transition"
+                className="pl-8 w-89.25 h-15.75 text-sm border border-system-neutral rounded-[8px] bg-bg-content text-text-primary transition"
               />
               <MagnifyingGlassIcon
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
+                className="absolute right-8 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary pointer-events-none"
+                aria-hidden="true"
               />
             </div>
           </div>
@@ -191,7 +226,8 @@ export default function TasksSection({
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex gap-4 items-start mt-4 pb-4">
+            <div className="flex flex-col md:flex-row gap-4 items-start mt-4 pb-4">
+
               {COLUMNS.map((col) => (
                 <KanbanColumn
                   key={col.id}

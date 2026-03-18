@@ -52,9 +52,9 @@ export default function ContributorSearch({
           {selectedUsers.map((u) => (
             <div
               key={u.id}
-              className="flex items-center gap-1.5 bg-bg-grey-light rounded-full px-2 py-1"
+              className="flex items-center gap-1.5  rounded-full px-2 py-1"
             >
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
                 u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
               }`}>
                 <span className={`text-[9px] ${
@@ -63,7 +63,23 @@ export default function ContributorSearch({
                   {getInitials(u.name)}
                 </span>
               </div>
-              <span className="text-xs text-text-primary">{u.name}</span>
+
+               <div
+                className={` px-2 py-0.5 rounded-full flex items-center justify-center ${
+                  u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
+                }`}
+                >
+                <span
+                  className={`text-[10px]  ${
+                    u.id === ownerId
+                      ? "text-text-primary"
+                      : "text-text-secondary"
+                  }`}
+                >
+                  {u.name}
+                </span>
+              </div>
+
               <button
                 type="button"
                 onClick={() => onRemove(u.id)}

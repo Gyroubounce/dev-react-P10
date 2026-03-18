@@ -19,15 +19,13 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   setError("");
 
-  try {
-    console.log("Tentative de login avec :", { email, password }); // 🔹 log input
-    await login(email, password);
-    console.log("Login réussi, redirection vers /dashboard");
-    router.push("/dashboard");
-  } catch (err) {
-    console.log("Erreur login :", err); // 🔹 log erreur exacte
-    setError("Identifiants incorrects");
-  }
+try {
+  await login(email, password);
+  router.push("/dashboard");
+} catch {
+  setError("Identifiants incorrects");
+}
+
 }
 
   return (

@@ -40,15 +40,20 @@ test.describe("Projects — CRUD complet (UI réelle)", () => {
     await page.fill("#project-description", "Description du projet E2E");
 
     // --- AJOUT CONTRIBUTEURS ---
-    const contributorsBtn = page.getByRole("button", { name: /collaborateurs/i });
+    let contributorsBtn = page.getByRole("button", { name: /collaborateurs/i });
     await contributorsBtn.click();
 
     // Sélection de 2 utilisateurs
-    const users = page.locator('button:has(span)');
-    await users.nth(0).click();
-    await contributorsBtn.click(); // rouvrir le dropdown si nécessaire
+    let users = page.locator('button:has(span)');
     await users.nth(1).click();
 
+     contributorsBtn = page.getByRole("button", { name: /1 collaborateur/i });
+    await contributorsBtn.click();
+
+    // Sélection de 2 utilisateurs
+     users = page.locator('button:has(span)');
+    await users.nth(1).click();
+    
     // Création du projet
     await page.click('button[type="submit"]:has-text("Créer")');
 

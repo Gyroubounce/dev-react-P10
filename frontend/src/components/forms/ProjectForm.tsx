@@ -66,7 +66,7 @@ export default function ProjectForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-      <div className="w-113 mx-auto overflow-y-auto flex flex-col gap-4 pr-1">
+      <div className="w-113 h-auto mx-auto overflow-y-auto flex flex-col gap-4 pr-1">
 
         {/* Titre */}
         <div className="flex flex-col gap-1">
@@ -111,13 +111,31 @@ export default function ProjectForm({
               {/* Propriétaire */}
               {ownerMember && (
                 <div className="flex items-center gap-1 px-2.5 rounded-full">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center bg-brand-light">
-                    <span className="text-[10px] font-semibold text-btn-black">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      ownerMember.user.id === ownerId
+                        ? "bg-brand-light"
+                        : "bg-bg-grey-border"
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px]  ${
+                        ownerMember.user.id === ownerId
+                          ? "text-text-primary"
+                          : "text-text-secondary"
+                      }`}
+                    >
                       {ownerInitials}
                     </span>
                   </div>
 
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-light text-text-primary">
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full ${
+                      ownerMember.user.id === ownerId
+                        ? "bg-brand-light text-text-primary"
+                        : "bg-bg-grey-border text-text-secondary"
+                    }`}
+                  >
                     {ownerName}
                   </span>
                 </div>
@@ -126,13 +144,29 @@ export default function ProjectForm({
               {/* Contributeurs du projet */}
               {selectedContributors.map((user) => (
                 <div key={user.id} className="flex items-center gap-1 px-2.5 rounded-full">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center bg-bg-grey-border">
-                    <span className="text-[10px] font-semibold text-text-secondary">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      user.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] ${
+                        user.id === ownerId
+                          ? "text-text-primary"
+                          : "text-text-secondary"
+                      }`}
+                    >
                       {getInitials(user.name)}
                     </span>
                   </div>
 
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-grey-border text-text-secondary">
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full ${
+                      user.id === ownerId
+                        ? "bg-brand-light text-text-primary"
+                        : "bg-bg-grey-border text-text-secondary"
+                    }`}
+                  >
                     {user.name}
                   </span>
 
@@ -149,6 +183,7 @@ export default function ProjectForm({
 
             </div>
           </div>
+
         )}
 
         {/* Recherche contributeurs */}

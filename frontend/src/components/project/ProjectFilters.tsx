@@ -88,7 +88,7 @@ export default function ProjectFilters({
               </select>
 
               <svg
-                className="absolute right-5 top-1/2 -translate-y-1/2 h-7 w-7 text-text-secondary pointer-events-none"
+                className="absolute right-7 top-1/2 -translate-y-1/2 h-7 w-7 text-text-secondary pointer-events-none"
                 viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"

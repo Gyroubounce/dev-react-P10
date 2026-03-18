@@ -39,7 +39,7 @@ export default function ProjectHeader({
     <div className="flex flex-col gap-6">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col  md:flex-row md:items-start md:justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -52,7 +52,7 @@ export default function ProjectHeader({
 
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-3">
-              <h1 className="font-semibold text-[24px] text-text-primary">
+              <h1 className="font-semibold text-[20px] md:text-[24px] text-text-primary">
                 {project.name}
               </h1>
 
@@ -60,7 +60,7 @@ export default function ProjectHeader({
                 <button
                   type="button"
                   onClick={onEditProject}
-                  className="text-sm text-brand-dark underline hover:text-btn-black transition"
+                  className="text-xs md:text-sm text-brand-dark underline hover:text-btn-black transition"
                 >
                   modifier
                 </button>
@@ -68,7 +68,7 @@ export default function ProjectHeader({
             </div>
 
             {project.description && (
-              <p className="text-[18px] text-text-secondary">
+              <p className="text-sm md:text-[18px] text-text-secondary">
                 {project.description}
               </p>
             )}
@@ -76,23 +76,26 @@ export default function ProjectHeader({
         </div>
 
         {/* Boutons Créer une tâche + IA */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 ml-11">
           <Button
             variant="creer-tache"
             onClick={onCreateTask}
             ariaLabel="Créer une nouvelle tâche"
-          >
-            Créer une tâche
+           className="flex items-center justify-center"
+            >
+              <span className="hidden md:inline">Créer une tâche</span>
+              <span className="md:hidden text-[14px]">+ Tâche</span>
           </Button>
 
           <button
             type="button"
             onClick={onCreateAITask}
-            className="flex items-center justify-center gap-1 w-23.5 h-12.5 bg-brand-dark text-text-white text-sm rounded-[10px] hover:bg-bg-content hover:text-brand-dark border border-brand-dark transition"
+            className="flex items-center justify-center gap-1 w-10 h-10
+             md:w-23.5 md:h-12.5 bg-brand-dark text-text-white text-sm rounded-[10px] hover:bg-bg-content hover:text-brand-dark border border-brand-dark transition"
             aria-label="Générer des tâches avec l'IA"
           >
             <IAIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
-            IA
+             <span className="hidden md:inline">IA</span>
           </button>
         </div>
       </div>

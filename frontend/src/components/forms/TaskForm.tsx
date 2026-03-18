@@ -65,7 +65,7 @@ export default function TaskForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-      <div className="w-113 h-133.75 mx-auto overflow-y-auto flex flex-col gap-4 pr-1">
+      <div className="w-113 h-auto mx-auto overflow-y-auto flex flex-col gap-4 pr-1">
 
         {/* Titre */}
         <div className="flex flex-col gap-1">

@@ -44,15 +44,15 @@ export default function MemberSearch({
           {selectedUsers.map((u) => (
             <div
               key={u.id}
-              className="flex items-center gap-1.5 bg-bg-grey-light rounded-full px-2 py-1"
-            >
+              className="flex items-center gap-1.5 px-2 py-1"
+            > 
               <div
-                className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0  ${
                   u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
                 }`}
-              >
+                >
                 <span
-                  className={`text-[9px] ${
+                  className={`text-[10px] ${
                     u.id === ownerId
                       ? "text-text-primary"
                       : "text-text-secondary"
@@ -62,7 +62,21 @@ export default function MemberSearch({
                 </span>
               </div>
 
-              <span className="text-xs text-text-primary">{u.name}</span>
+              <div
+                className={` px-2 py-0.5 rounded-full flex items-center justify-center ${
+                  u.id === ownerId ? "bg-brand-light" : "bg-bg-grey-border"
+                }`}
+                >
+                <span
+                  className={`text-[10px]  ${
+                    u.id === ownerId
+                      ? "text-text-primary"
+                      : "text-text-secondary"
+                  }`}
+                >
+                  {u.name}
+                </span>
+              </div>
 
               <button
                 type="button"
@@ -114,7 +128,7 @@ export default function MemberSearch({
                   }`}
                 >
                   <span
-                    className={`text-[9px] font-semibold ${
+                    className={`text-[10px] font-semibold ${
                       u.id === ownerId
                         ? "text-text-primary"
                         : "text-text-secondary"
@@ -125,7 +139,7 @@ export default function MemberSearch({
                 </div>
 
                 <span
-                  className={`px-2 py-0.5 rounded-full text-sm ${
+                  className={`px-2 py-0.5 rounded-full text[10px] ${
                     u.id === ownerId
                       ? "bg-brand-light text-text-primary"
                       : "bg-bg-grey-border text-text-secondary"

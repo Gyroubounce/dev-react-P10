@@ -68,7 +68,7 @@ export default function ProjectDetailPage() {
   }
 
   const isOwner = project.owner.id === user?.id;
-
+  
   const projectContributors =
     project.members
       ?.filter((m) => m.user.id !== project.owner.id)

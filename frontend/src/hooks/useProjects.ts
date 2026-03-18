@@ -106,6 +106,7 @@ export function useProjects() {
   // DELETE PROJECT
   // ---------------------------------------------------------
   async function deleteProject(projectId: string): Promise<void> {
+    
     const { error } = await apiDeleteProject(projectId);
     if (error) throw new Error(error);
 

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import BaseModal from "@/components/modals/BaseModal";
 import ProjectForm from "@/components/forms/ProjectForm";
 import type { User } from "@/types/index";
+import { useAuth } from "@/hooks/useAuth"; // exemple
 
 type Props = {
   onClose: () => void;
@@ -11,9 +13,13 @@ type Props = {
 };
 
 export default function CreateProjectModal({ onClose, onSubmit }: Props) {
+  const { user } = useAuth();        // 🔥 utilisateur connecté
+  const ownerId = user?.id;          // 🔥 owner = user connecté
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedContributors, setSelectedContributors] = useState<User[]>([]);
+  const router = useRouter();
 
   async function handleSubmit(name: string, description: string) {
     setError(null);
@@ -21,6 +27,7 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
     try {
       await onSubmit(name, description, selectedContributors);
       onClose();
+      router.push("/dashboard/projects");
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("Une erreur est survenue");
@@ -37,16 +44,12 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
         error={error}
         onSubmit={handleSubmit}
 
-        // 🔹 Pas de membres initiaux lors de la création
-        initialMembers={[]}
+        initialMembers={[]}               // pas de membres initiaux
+        ownerId={ownerId}                 // 🔥 maintenant présent !
 
-        // 🔹 Aucun contributeur au début
         projectContributors={selectedContributors}
-
-        // 🔹 Total = contributeurs sélectionnés + owner (owner sera ajouté après création)
         totalContributors={selectedContributors.length}
 
-        // 🔹 Gestion des contributeurs
         selectedContributors={selectedContributors}
         onAddContributor={(user) =>
           setSelectedContributors((prev) => [...prev, user])
@@ -55,8 +58,7 @@ export default function CreateProjectModal({ onClose, onSubmit }: Props) {
           setSelectedContributors((prev) => prev.filter((u) => u.id !== userId))
         }
 
-        // 🔹 Pas de suppression de projet ici
-        onDelete={() => {}}
+        onDelete={() => {}}               // pas de suppression ici
       />
     </BaseModal>
   );

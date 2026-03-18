@@ -17,7 +17,6 @@ export default function DashboardHeader({
 }: Props) {
 
 
-console.log("NAME FRONT:", name);
 
   return (
     <div className="flex flex-col gap-12 my-8">
@@ -25,16 +24,22 @@ console.log("NAME FRONT:", name);
       {/* Titre + bouton */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-[24px] font-semibold text-text-primary">
+          <h1 className="text-[28px] font-semibold text-text-primary">
             Tableau de bord
           </h1>
-          <p className="text-[18px] text-black">
-            Bonjour {name}, voici un aperçu de vos projets et tâches.
+          <p className="text-[18px] text-black leading-snug">
+            <span className="block md:inline">Bonjour {name}, </span>
+            <span className="block md:inline">voici un aperçu de vos projets et tâches.</span>
           </p>
         </div>
 
-        <Button variant="creer-projet" onClick={() => onCreateProject()} ariaLabel="Créer un nouveau projet">
-          + Créer un projet
+        <Button 
+        variant="creer-projet" 
+        onClick={() => onCreateProject()} 
+        ariaLabel="Créer un nouveau projet"
+        className="flex items-center justify-center gap-2 mr-5 md:mr-0">
+          <span>+</span>
+          <span className="hidden md:inline">Créer un projet</span>
         </Button>
       </div>
 

@@ -34,13 +34,20 @@ test.describe("Tasks — CRUD complet avec projet + contributeurs + IDs", () => 
       await page.fill("#project-description", "Projet généré automatiquement pour les tests E2E");
 
       // --- AJOUT CONTRIBUTEURS ---
-      const contributorsBtn = page.getByRole("button", { name: /collaborateurs/i });
-      await contributorsBtn.click();
+      
+    let contributorsBtn = page.getByRole("button", { name: /collaborateurs/i });
+    await contributorsBtn.click();
 
-      const users = page.locator('button:has(span)');
-      await users.nth(0).click();
-      await contributorsBtn.click();
-      await users.nth(1).click();
+    // Sélection de 2 utilisateurs
+    let users = page.locator('button:has(span)');
+    await users.nth(1).click();
+
+     contributorsBtn = page.getByRole("button", { name: /1 collaborateur/i });
+    await contributorsBtn.click();
+
+    // Sélection de 2 utilisateurs
+     users = page.locator('button:has(span)');
+    await users.nth(1).click();
 
       // Création du projet
       await page.click('button[type="submit"]:has-text("Créer")');
@@ -84,12 +91,16 @@ test.describe("Tasks — CRUD complet avec projet + contributeurs + IDs", () => 
       await createDialog.getByLabel("Date d'échéance").fill(dueDateStr);
 
       // 3️⃣ Sélectionner les assignés
-      const assigneesBtn = createDialog.getByRole("button", { name: "Choisir des assignés" });
+      let assigneesBtn = createDialog.getByRole("button", { name: "Choisir des assignés" });
       await assigneesBtn.click();
-      const assignees = createDialog.locator('button:has(span)');
-      await assignees.first().click();       // premier assigné
-      await assigneesBtn.click();            // rouvrir si nécessaire
-      await assignees.nth(1).click();       // deuxième assigné
+      let assignees = createDialog.locator('button:has(span)');
+      await assignees.nth(1).click();        
+         
+      assigneesBtn = createDialog.getByRole("button", { name: "1 assigné(s)" });
+      await assigneesBtn.click();
+      assignees = createDialog.locator('button:has(span)');
+      await assignees.nth(1).click();    
+
 
       // 4️⃣ Statut
       await createDialog.getByRole("button", { name: "À faire" }).click();

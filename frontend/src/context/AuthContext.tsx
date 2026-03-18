@@ -34,19 +34,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: "include",
       });
 
-      console.log("Réponse profile brute :", res);
+      
 
       if (!res.ok) {
-        console.log("Pas de profil récupéré, status :", res.status);
+        
         setUser(null);
         return;
       }
 
       const data = await res.json();
-      console.log("Profil récupéré :", data);
+     
       setUser(data.data.user);
-    } catch (err) {
-      console.error("Erreur refreshProfile :", err);
+    } catch  {
+    
       setUser(null);
     } finally {
       setLoading(false);
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 🔹 Login
   async function login(email: string, password: string): Promise<void> {
     try {
-      console.log("Tentative de login avec :", { email, password });
+     
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const result = await res.json();
-      console.log("Réponse login :", result);
+     
 
       if (!res.ok) {
         throw new Error(result.message || "Identifiants incorrects");
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Mettre à jour l'utilisateur
       setUser(result.data.user);
     } catch (err) {
-      console.error("Erreur login :", err);
+      
       throw err; // remonter l'erreur pour l'affichage côté formulaire
     }
   }
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 🔹 Register
 async function register(email: string, password: string): Promise<void> {
   try {
-    console.log("Tentative d'inscription :", { email, password });
+    
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
       method: "POST",
@@ -96,7 +96,7 @@ async function register(email: string, password: string): Promise<void> {
     });
 
     const result = await res.json();
-    console.log("Réponse register :", result);
+  
 
     if (!res.ok) {
       throw new Error(result.message || "Erreur lors de l'inscription");
@@ -106,7 +106,7 @@ async function register(email: string, password: string): Promise<void> {
     setUser(result.data.user);
 
   } catch (err) {
-    console.error("Erreur register :", err);
+    
     throw err;
   }
 }

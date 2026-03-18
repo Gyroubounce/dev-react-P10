@@ -23,12 +23,14 @@ export default function Header() {
       <div className="max-w-303.75 w-full h-23.5 flex items-center justify-between px-4">
 
         {/* Logo */}
-        <Link
-          href="/dashboard"
-          className="text-2xl"
-          aria-label="Retour au tableau de bord"
-        >
-           <Image src={Logo} alt="Logo- Accueil" width={147}  priority style={{ height: "auto" }} />
+        <Link href="/dashboard" aria-label="Retour au tableau de bord">
+          <Image
+            src={Logo}
+            alt="Logo- Accueil"
+            width={147}
+            priority
+            className="h-auto max-w-30 md:max-w-36.75"
+          />
         </Link>
 
         {/* Navigation */}
@@ -38,7 +40,7 @@ export default function Header() {
             aria-current={isDashboard ? "page" : undefined}
             className={`
               group relative
-              w-62 h-19.5
+              w-16 md:w-62 h-12 md:h-19.5
               flex items-center justify-center gap-3
               rounded-md text-sm
               transition-colors
@@ -48,9 +50,8 @@ export default function Header() {
               }
             `}
           >
-        <DashboardIcon className="w-5 h-5" aria-hidden="true" />
-            
-            Tableau de bord
+            <DashboardIcon className="w-5 h-5" aria-hidden="true" />
+            <span className="hidden md:inline whitespace-nowrap">Tableau de bord</span>
           </Link>
 
           <Link
@@ -58,7 +59,7 @@ export default function Header() {
             aria-current={isProjets ? "page" : undefined}
             className={`
               group relative
-              w-62 h-19.5
+              w-16 md:w-62 h-12 md:h-19.5
               flex items-center justify-center gap-3
               rounded-md text-sm
               transition-colors
@@ -68,8 +69,8 @@ export default function Header() {
               }
             `}
           >
-        <FolderNavIcon className="w-6 h-6" aria-hidden="true" />
-            Projets
+            <FolderNavIcon className="w-6 h-6" aria-hidden="true" />
+            <span className="hidden md:inline whitespace-nowrap">Projets</span>
           </Link>
         </nav>
 
@@ -78,12 +79,16 @@ export default function Header() {
           href="/dashboard/account"
           aria-label="Accéder à mon profil"
           aria-current={isProfile ? "page" : undefined}
-          className={`w-16.25 h-16.25 rounded-full flex items-center justify-center font-semibold text-sm transition
+          className={`
+            w-12 h-12
+            md:w-16.25 md:h-16.25
+            
+            rounded-full flex items-center justify-center font-semibold text-sm transition
             ${isProfile
               ? "bg-brand-dark text-white"
               : "bg-brand-light text-brand-dark hover:ring-1 hover:ring-brand-dark"
             }`}
-                  >
+        >
           {user ? getInitials(user.name) : "?"}
         </Link>
 

@@ -107,7 +107,7 @@ export default function AccountForm() {
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          className="border border-system-neutral rounded-[8px] px-4 py-2.5 text-sm text-text-secondary bg-bg-content transition"
+          className="border border-system-neutral  px-4 py-2.5 text-text-secondary bg-bg-content transition"
           placeholder="Votre nom"
           autoComplete="family-name"
           aria-required="true"
@@ -125,7 +125,7 @@ export default function AccountForm() {
           type="text"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="border border-system-neutral rounded-[8px] px-4 py-2.5 text-sm text-text-secondary bg-bg-content transition"
+          className="border border-system-neutral  px-4 py-2.5  text-text-secondary bg-bg-content transition"
           placeholder="Votre prénom"
           autoComplete="given-name"
           aria-required="true"
@@ -143,7 +143,7 @@ export default function AccountForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border border-system-neutral rounded-[8px] px-4 py-2.5 text-sm text-text-secondary bg-bg-content transition"
+          className="border border-system-neutral px-4 py-2.5  text-text-secondary bg-bg-content transition"
           placeholder="votre@email.com"
           autoComplete="email"
           aria-required="true"
@@ -162,7 +162,7 @@ export default function AccountForm() {
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-system-neutral rounded-[8px] px-4 py-2.5 pr-11 text-sm text-text-secondary bg-bg-content transition"
+            className="w-full border border-system-neutral px-4 py-2.5 pr-11 text-sm text-text-secondary bg-bg-content transition"
             placeholder="••••••••"
             autoComplete="new-password"
           />
@@ -199,7 +199,7 @@ export default function AccountForm() {
       <button
         type="submit"
         disabled={loading}
-        className="mt-2 w-fit px-6 py-2.5 bg-btn-black text-text-white text-base rounded-[8px] hover:border border-brand-dark hover:bg-bg-content hover:text-brand-dark"
+        className="mt-3 w-60.5 h-12.5 px-6 py-2.5 bg-btn-black text-text-white text-base rounded-[10px] hover:border border-brand-dark hover:bg-bg-content hover:text-brand-dark"
       >
         {loading ? "Enregistrement en cours..." : "Modifier les informations"}
       </button>

@@ -51,8 +51,13 @@ export default function ProjectsPage() {
           </p>
         </div>
 
-        <Button variant="creer-projet" onClick={() => openModal("createProject")} ariaLabel="Créer un nouveau projet">
-          + Créer un projet
+        <Button 
+        variant="creer-projet" 
+        onClick={() => openModal("createProject")} 
+        ariaLabel="Créer un nouveau projet"
+        className="flex items-center justify-center gap-2 mr-5 md:mr-0">
+          <span>+</span>
+          <span className="hidden md:inline">Créer un projet</span>
         </Button>
       </div>
 
