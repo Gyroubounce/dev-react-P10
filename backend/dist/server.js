@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log("BOOT OK");
 require("dotenv/config");
 const client_1 = require("@prisma/client");
 const app_1 = require("./app");

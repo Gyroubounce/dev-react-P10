@@ -1,3 +1,4 @@
+console.log("BOOT OK");
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { createApp } from "./app";

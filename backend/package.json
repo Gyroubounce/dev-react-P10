@@ -4,7 +4,7 @@
   "description": "API REST avec authentification utilisateur - Node.js + Express + TypeScript + Prisma",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+     "build": "prisma generate && tsc",
     "start": "node dist/server.js",
     "dev": "nodemon src/index.ts",
     "db:generate": "prisma generate",
