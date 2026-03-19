@@ -1,3 +1,5 @@
+console.log("[APP] app.ts chargé");
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -6,15 +8,15 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 
 import swaggerUi from "swagger-ui-express";
-import { specs } from "@/config/swagger"; // adapte le chemin si besoin
+import { specs } from "./config/swagger"; 
 
-import authRoutes from "@/routes/authRoutes";
-import projectRoutes from "@/routes/projectRoutes";
-import dashboardRoutes from "@/routes/dashboardRoutes";
-import oauthRoutes from "@/routes/oauth";
+import authRoutes from "./routes/authRoutes";
+import projectRoutes from "./routes/projectRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
+import oauthRoutes from "./routes/oauth";
 
-import { authenticateToken } from "@/middleware/auth"; // adapte si besoin
-import { searchUsers, getAllUsers } from "@/controllers/projectController"; // adapte si besoin
+import { authenticateToken } from "./middleware/auth"; 
+import { searchUsers, getAllUsers } from "./controllers/projectController"; 
 
 export const createApp = () => {
  const app = express();
@@ -137,6 +139,6 @@ app.use(
  });
  }
  );
-
+console.log("[APP] app initialisée");
  return app;
 };
