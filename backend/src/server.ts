@@ -1,5 +1,17 @@
 console.log("BOOT OK");
-import "dotenv/config";
+
+try {
+ // eslint-disable-next-line @typescript-eslint/no-var-requires
+ require("dotenv/config");
+ console.log("[ENV] dotenv chargé");
+} catch (e) {
+ console.error("[ENV] dotenv non chargé", e);
+}
+
+console.log("[ENV] NODE_ENV =", process.env.NODE_ENV);
+console.log("[ENV] PORT =", process.env.PORT);
+console.log("[ENV] DATABASE_URL =", process.env.DATABASE_URL ? "SET" : "MISSING");
+
 import { PrismaClient } from "@prisma/client";
 import { createApp } from "./app";
 
@@ -9,28 +21,36 @@ const app = createApp();
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = "0.0.0.0";
 
-const startServer = async () => {
- try {
- await prisma.$connect();
- console.log("✅ Connexion à la base de données établie");
+process.on("unhandledRejection", (reason) => {
+ console.error("[FATAL] unhandledRejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+ console.error("[FATAL] uncaughtException:", err);
+ process.exit(1);
+});
 
+async function startServer() {
+ console.log("[START] Début startServer()");
+ try {
+ console.log("[PRISMA] Tentative de connexion...");
+ await prisma.$connect();
+ console.log("[PRISMA] ✅ Connecté");
+
+ console.log("[HTTP] Démarrage serveur...");
  app.listen(PORT, HOST, () => {
- console.log(`🚀 Serveur démarré sur http://${HOST}:${PORT}`);
- console.log(`📊 Environnement: ${process.env.NODE_ENV || "development"}`);
+ console.log(`[HTTP] ✅ Listen sur http://${HOST}:${PORT}`);
  });
  } catch (error) {
- console.error("❌ Erreur lors du démarrage du serveur:", error);
+ console.error("[START] ❌ Erreur au démarrage:", error);
+ try {
+ console.log("[PRISMA] Disconnect (cleanup)...");
+ await prisma.$disconnect();
+ console.log("[PRISMA] ✅ Disconnected");
+ } catch (e) {
+ console.error("[PRISMA] ❌ Erreur disconnect:", e);
+ }
  process.exit(1);
  }
-};
-
-const shutdown = async () => {
- console.log("\n🛑 Arrêt du serveur...");
- await prisma.$disconnect();
- process.exit(0);
-};
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+}
 
 startServer();
