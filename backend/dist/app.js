@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createApp = void 0;
+console.log("[APP] app.ts chargé");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -11,13 +12,13 @@ const morgan_1 = __importDefault(require("morgan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const passport_1 = __importDefault(require("passport"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
-const swagger_1 = require("@/config/swagger");
-const authRoutes_1 = __importDefault(require("@/routes/authRoutes"));
-const projectRoutes_1 = __importDefault(require("@/routes/projectRoutes"));
-const dashboardRoutes_1 = __importDefault(require("@/routes/dashboardRoutes"));
-const oauth_1 = __importDefault(require("@/routes/oauth"));
-const auth_1 = require("@/middleware/auth");
-const projectController_1 = require("@/controllers/projectController");
+const swagger_1 = require("./config/swagger");
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const projectRoutes_1 = __importDefault(require("./routes/projectRoutes"));
+const dashboardRoutes_1 = __importDefault(require("./routes/dashboardRoutes"));
+const oauth_1 = __importDefault(require("./routes/oauth"));
+const auth_1 = require("./middleware/auth");
+const projectController_1 = require("./controllers/projectController");
 const createApp = () => {
     const app = (0, express_1.default)();
     app.use((0, cookie_parser_1.default)());
@@ -109,6 +110,7 @@ const createApp = () => {
                 : "Internal server error",
         });
     });
+    console.log("[APP] app initialisée");
     return app;
 };
 exports.createApp = createApp;

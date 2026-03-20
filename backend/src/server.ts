@@ -39,7 +39,15 @@ async function startServer() {
  console.log("[START] Début startServer()");
  try {
  console.log("[PRISMA] Tentative de connexion...");
- await prisma.$connect();
+
+await Promise.race([
+ prisma.$connect(),
+ new Promise((_, reject) =>
+ setTimeout(() => reject(new Error("Prisma connect timeout (10s)")), 10000)
+ ),
+]);
+
+/* await prisma.$connect();*/
  console.log("[PRISMA] ✅ Connecté");
 
  console.log("[HTTP] Démarrage serveur...");
