@@ -138,6 +138,16 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Générer le token JWT
     const token = generateToken(newUser.id, newUser.email);
 
+
+    // 🔥 FIX COOKIE CROSS-DOMAIN (Hostinger + Next.js)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,          // obligatoire en HTTPS
+      sameSite: "none",      // obligatoire car frontend ≠ backend
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      path: "/",             // recommandé
+    });
+
     // Envoyer la réponse
     sendSuccess(
       res,
@@ -259,22 +269,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       createdAt: user.createdAt,
     };
   // 🔹 Stocker le token dans un cookie HttpOnly
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
-        sameSite: "lax",
-        path: "/",
-      })
-     .status(200)
-      .json({
-        success: true,
-        message: "Connexion réussie",
-        data: {
-          user: userData,          
-        },
-      });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,          // obligatoire en HTTPS
+      sameSite: "none",      // obligatoire car frontend ≠ backend
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      path: "/",             // recommandé
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Connexion réussie",
+      data: {
+        user: userData,
+      },
+    });
+
   } catch (error) {
     console.error("Erreur lors de la connexion:", error);
     sendServerError(res, "Erreur lors de la connexion");
