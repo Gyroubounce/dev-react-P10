@@ -19,9 +19,10 @@ router.get('/auth/github/callback', passport_1.default.authenticate('github', {
     const token = jsonwebtoken_1.default.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
     });
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
 });

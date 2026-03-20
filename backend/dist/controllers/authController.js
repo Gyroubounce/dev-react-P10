@@ -41,6 +41,13 @@ const register = async (req, res) => {
             },
         });
         const token = (0, jwt_1.generateToken)(newUser.id, newUser.email);
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: "/",
+        });
         (0, response_1.sendSuccess)(res, "Utilisateur créé avec succès", {
             user: newUser,
             token,
@@ -81,16 +88,14 @@ const login = async (req, res) => {
             name: user.name,
             createdAt: user.createdAt,
         };
-        res
-            .cookie("token", token, {
+        res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: true,
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: "lax",
             path: "/",
-        })
-            .status(200)
-            .json({
+        });
+        res.status(200).json({
             success: true,
             message: "Connexion réussie",
             data: {
