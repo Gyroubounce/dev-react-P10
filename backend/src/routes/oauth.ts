@@ -33,10 +33,10 @@ router.get(
     // 🔥 FIX COOKIE CROSS-DOMAIN (Hostinger + Next.js)
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,          // obligatoire en HTTPS
-      sameSite: 'none',      // obligatoire car frontend ≠ backend
+      secure: true,          
+      sameSite: 'none',      
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
-      path: '/',             // recommandé
+      path: '/',             
     });
 
     // Rediriger vers le dashboard
