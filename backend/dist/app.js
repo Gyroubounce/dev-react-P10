@@ -24,9 +24,10 @@ const createApp = () => {
     app.use((0, cookie_parser_1.default)());
     app.use(passport_1.default.initialize());
     app.use((0, helmet_1.default)());
-    const allowedOrigins = process.env.NODE_ENV === "production"
-        ? [process.env.FRONTEND_URL].filter((o) => Boolean(o))
-        : ["http://localhost:3000"];
+    const allowedOrigins = [
+        "https://abricot.webyourprogress.fr",
+        "http://localhost:3000"
+    ];
     app.use((0, cors_1.default)({
         origin: allowedOrigins,
         credentials: true,
