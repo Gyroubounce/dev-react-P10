@@ -25,10 +25,11 @@ export const createApp = () => {
  app.use(passport.initialize());
  app.use(helmet());
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? [process.env.FRONTEND_URL].filter((o): o is string => Boolean(o))
-    : ["http://localhost:3000"];
+const allowedOrigins = [
+  "https://abricot.webyourprogress.fr",
+  "http://localhost:3000"
+];
+
 
 
 app.use(
