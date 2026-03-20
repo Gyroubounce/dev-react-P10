@@ -15,11 +15,29 @@ passport.use(
     async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
         // Récupérer l'email (peut être null si privé)
-        const email = profile.emails?.[0]?.value;
-        
-        if (!email) {
-          return done(new Error('Aucun email public trouvé sur GitHub. Rendez votre email public dans les paramètres GitHub.'));
-        }
+        let email = profile.emails?.[0]?.value;
+
+          if (!email) {
+            const emailsResponse = await fetch("https://api.github.com/user/emails", {
+              headers: {
+                Authorization: `token ${accessToken}`,
+                Accept: "application/vnd.github+json",
+              },
+            });
+
+            // 🔥 CAST propre pour éviter l'erreur TS
+            const emails = (await emailsResponse.json()) as {
+              email: string;
+              primary: boolean;
+            }[];
+
+            email = emails.find((e) => e.primary)?.email || emails[0]?.email;
+          }
+
+          if (!email) {
+            return done(new Error("Impossible de récupérer un email GitHub."));
+          }
+
 
         // Chercher l'utilisateur par email ou githubId
         let user = await prisma.user.findFirst({

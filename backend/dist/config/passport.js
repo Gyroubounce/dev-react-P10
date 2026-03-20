@@ -14,9 +14,19 @@ passport_1.default.use(new passport_github2_1.Strategy({
     scope: ['user:email'],
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        const email = profile.emails?.[0]?.value;
+        let email = profile.emails?.[0]?.value;
         if (!email) {
-            return done(new Error('Aucun email public trouvé sur GitHub. Rendez votre email public dans les paramètres GitHub.'));
+            const emailsResponse = await fetch("https://api.github.com/user/emails", {
+                headers: {
+                    Authorization: `token ${accessToken}`,
+                    Accept: "application/vnd.github+json",
+                },
+            });
+            const emails = (await emailsResponse.json());
+            email = emails.find((e) => e.primary)?.email || emails[0]?.email;
+        }
+        if (!email) {
+            return done(new Error("Impossible de récupérer un email GitHub."));
         }
         let user = await prisma.user.findFirst({
             where: {
