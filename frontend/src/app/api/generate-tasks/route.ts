@@ -65,6 +65,10 @@ Maximum 6 tâches. Sois précis et actionnable.`,
   }
 }
   */
+
+ // Mocks vs IA
+
+
   // src/app/api/generate-tasks/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
