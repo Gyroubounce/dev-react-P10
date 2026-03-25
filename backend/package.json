@@ -6,6 +6,7 @@
   "scripts": {
     "build": "prisma generate && prisma migrate deploy && tsc && cd ../frontend && npm install && npm run build",
     "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
     "build:next": "next build",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
