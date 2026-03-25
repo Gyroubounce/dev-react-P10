@@ -22,17 +22,20 @@ backend/node_modules/
 backend/dist/
 backend/.env
 
-# Prisma (backend)
-backend/prisma/
-backend/generated/
-backend/prisma/generated/
-generated/prisma
+# Prisma - Garder schema.prisma et migrations/, ignorer les DB
+backend/prisma/dev.db*
+backend/prisma/prod.db*
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/prisma/data/
 
 # Base de données
 *.db
+*.db-journal
 *.sqlite
 *.sqlite3
 dev.db
+prod.db
 
 # --- FRONTEND ---
 frontend/node_modules/

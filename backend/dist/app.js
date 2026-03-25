@@ -11,6 +11,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const passport_1 = __importDefault(require("passport"));
+const path_1 = __importDefault(require("path"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_1 = require("./config/swagger");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
@@ -24,10 +25,10 @@ const createApp = () => {
     app.use((0, cookie_parser_1.default)());
     app.use(passport_1.default.initialize());
     app.use((0, helmet_1.default)());
-    const allowedOrigins = [
-        "https://abricot.webyourprogress.fr",
-        "http://localhost:3000"
-    ];
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',')
+        : ["http://localhost:3000"];
+    console.log("[CORS] Origins autorisées:", allowedOrigins);
     app.use((0, cors_1.default)({
         origin: allowedOrigins,
         credentials: true,
@@ -94,6 +95,22 @@ const createApp = () => {
             },
         });
     });
+    if (process.env.NODE_ENV === "production") {
+        const frontendOutPath = path_1.default.join(__dirname, "../../frontend/out");
+        console.log("[FRONTEND] Serving static files from:", frontendOutPath);
+        app.use(express_1.default.static(frontendOutPath));
+        app.get("*", (req, res, next) => {
+            if (req.path.startsWith("/auth") ||
+                req.path.startsWith("/projects") ||
+                req.path.startsWith("/dashboard") ||
+                req.path.startsWith("/users") ||
+                req.path.startsWith("/health") ||
+                req.path.startsWith("/api-docs")) {
+                return next();
+            }
+            res.sendFile(path_1.default.join(frontendOutPath, "index.html"));
+        });
+    }
     app.use("*", (req, res) => {
         res.status(404).json({
             success: false,

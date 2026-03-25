@@ -1,12 +1,12 @@
 {
   "name": "oc-p10",
   "version": "1.0.0",
-  "description": "API REST avec authentification utilisateur - Node.js + Express + TypeScript + Prisma",
+  "description": "prisma generate && prisma migrate deploy && tsc && cd ../frontend && npm install && npm run build",
   "main": "dist/server.js",
   "scripts": {
-     "build": "prisma generate && tsc",
+    "build": "prisma generate && prisma migrate deploy && tsc && cd ../frontend && npm install && npm run build",
     "start": "node dist/server.js",
-    "dev": "nodemon src/index.ts",
+    "dev": "tsx watch src/server.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -26,7 +26,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.7.1",
+    "@prisma/client": "^5.22.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.19.37",
+    "@types/passport": "^1.0.17",
+    "@types/passport-github2": "^1.2.9",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "bcryptjs": "^2.4.3",
@@ -39,24 +48,14 @@
     "morgan": "^1.10.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
-    "prisma": "^5.7.1",
+    "prisma": "^5.22.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.5",
-    "@types/morgan": "^1.9.9",
-    "@types/node": "^20.19.37",
-    "@types/passport": "^1.0.17",
-    "@types/passport-github2": "^1.2.9"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
-   
-    
+    "nodemon": "^3.0.2",
+    "tsx": "^4.21.0"
   }
 }
