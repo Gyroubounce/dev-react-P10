@@ -4,7 +4,7 @@
   "description": "prisma generate && prisma migrate deploy && tsc && cd ../frontend && npm install && npm run build",
   "main": "dist/server.js",
   "scripts": {
-    "build": "prisma generate && prisma migrate deploy && tsc && cd ../frontend && npm install && npm run build:next",
+    "build": "prisma generate && prisma migrate deploy && tsc && cd ../frontend && npm install && npm run build",
     "dev": "tsx watch src/server.ts",
     "build:next": "next build",
     "db:generate": "prisma generate",
