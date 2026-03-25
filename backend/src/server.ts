@@ -13,12 +13,22 @@ console.log("[ENV] DATABASE_URL =", process.env.DATABASE_URL ? "SET" : "MISSING"
 
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import { createApp as createApiApp } from "./app"; // ton app Express actuelle
+import { createApp as createApiApp } from "./app";
 import next from "next";
+import path from "path";
 
 const prisma = new PrismaClient();
+
 const dev = process.env.NODE_ENV !== "production";
-const nextApp = next({ dev });
+
+/**
+ * ✅ IMPORTANT : on pointe vers le dossier frontend
+ */
+const nextApp = next({
+  dev,
+  dir: path.join(__dirname, "../../frontend"),
+});
+
 const handle = nextApp.getRequestHandler();
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -46,20 +56,43 @@ async function startServer() {
     console.log("[PRISMA] ✅ Connecté");
 
     console.log("[NEXT] Préparation Next.js...");
-    await nextApp.prepare();
+    await nextApp.prepare(); // ⚠ nécessite .next (donc next build fait)
 
     const app = express();
 
-    // Middlewares API existants
+    /**
+     * ✅ API en priorité
+     */
     const apiApp = createApiApp();
     app.use(apiApp);
 
-    // Toutes les autres routes passent par Next.js (SSR)
-    app.all("*", (req, res) => handle(req, res));
+    /**
+     * ✅ Laisser Next gérer le reste (pages)
+     * MAIS on évite d'intercepter les routes API
+     */
+    app.all("*", (req, res) => {
+      if (
+        req.path.startsWith("/auth") ||
+        req.path.startsWith("/projects") ||
+        req.path.startsWith("/dashboard") ||
+        req.path.startsWith("/users") ||
+        req.path.startsWith("/api-docs") ||
+        req.path.startsWith("/health")
+      ) {
+        return res.status(404).json({
+          success: false,
+          message: "Route API non trouvée",
+        });
+      }
+
+      return handle(req, res);
+    });
 
     console.log("[HTTP] Démarrage serveur...");
     app.listen(PORT, HOST, () => {
-      console.log(`[HTTP] ✅ Serveur + Next.js SSR écoute sur http://${HOST}:${PORT}`);
+      console.log(
+        `[HTTP] ✅ Serveur + Next.js SSR écoute sur http://${HOST}:${PORT}`
+      );
     });
   } catch (error) {
     console.error("[START] ❌ Erreur au démarrage:", error);
