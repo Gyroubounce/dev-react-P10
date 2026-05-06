@@ -14,6 +14,7 @@ import dashboardRoutes from "./routes/dashboardRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import oauthRoutes from "./routes/oauth";
+import seedRoute from "./routes/seed";
 
 // Controllers
 import { searchUsers, getAllUsers } from "./controllers/projectController";
@@ -71,7 +72,7 @@ app.use(
   app.use("/dashboard", dashboardRoutes);
   app.use("/tasks", taskRoutes);
   app.use("/comments", commentRoutes);
-
+  app.use("/seed", seedRoute);
   // OAuth GitHub
   app.use(oauthRoutes);
 
