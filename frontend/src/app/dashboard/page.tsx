@@ -1,5 +1,6 @@
 "use client";
-import { useRouter ) from "next/navigation";
+
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboard } from "@/hooks/useDashboard";
@@ -12,20 +13,35 @@ import { updateTask as apiUpdateTask } from "@/lib/api/tasks";
 import type { User, Task } from "@/types/index";
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
   const router = useRouter();
-  const { tasks, projects, loading, error, updateTaskStatus} = useDashboard();
+
+  // Auth
+  const { user, loading: authLoading } = useAuth();
+
+  // Dashboard data
+  const { tasks, projects, loading: dashboardLoading, error, updateTaskStatus } = useDashboard();
+
+  // Projects
   const { createProject, fetchProjects } = useProjects();
+
+  // Modal
   const { isOpen, openModal, closeModal } = useModal();
+
   const [view, setView] = useState<"list" | "kanban">("list");
 
-  // 🔥 Fonction requise par TasksSection (édition complète)
+  // 🔥 Protection client
+  if (authLoading) return null;
+
+  if (!user) {
+    router.push("/auth/login");
+    return null;
+  }
+
   async function handleUpdateTask(taskId: string, data: Partial<Task>) {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
 
     await apiUpdateTask(task.projectId, taskId, data);
-    
   }
 
   async function handleCreateProject(
@@ -41,16 +57,8 @@ export default function DashboardPage() {
     await fetchProjects();
   }
 
-  if (loading) return null;
-
-if (!user) {
-  router.push("/auth/login");
-  return null;
-}
-
   return (
     <div className="flex flex-col">
-
       <DashboardHeader
         name={user?.name ?? ""}
         view={view}
@@ -61,11 +69,11 @@ if (!user) {
       <TasksSection
         tasks={tasks}
         projects={projects}
-        loading={loading}
+        loading={dashboardLoading}
         error={error}
         view={view}
         onUpdateTaskStatus={updateTaskStatus}
-        updateTask={handleUpdateTask}   // 🔥 opérationnel
+        updateTask={handleUpdateTask}
       />
 
       {isOpen("createProject") && (
@@ -74,7 +82,6 @@ if (!user) {
           onSubmit={handleCreateProject}
         />
       )}
-
     </div>
   );
 }
