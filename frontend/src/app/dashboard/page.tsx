@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter ) from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboard } from "@/hooks/useDashboard";
@@ -12,7 +12,8 @@ import { updateTask as apiUpdateTask } from "@/lib/api/tasks";
 import type { User, Task } from "@/types/index";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const { tasks, projects, loading, error, updateTaskStatus} = useDashboard();
   const { createProject, fetchProjects } = useProjects();
   const { isOpen, openModal, closeModal } = useModal();
@@ -39,6 +40,13 @@ export default function DashboardPage() {
 
     await fetchProjects();
   }
+
+  if (loading) return null;
+
+if (!user) {
+  router.push("/auth/login");
+  return null;
+}
 
   return (
     <div className="flex flex-col">
