@@ -79,7 +79,7 @@ export default function RegisterForm() {
 
       {/* Message d'erreur */}
       {error && (
-        <p className="text-sm text-system-error">{error}</p>
+        <p className="text-sm text-text-error">{error}</p>
       )}
 
       {/* Bouton */}
