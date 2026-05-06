@@ -34,13 +34,13 @@ export function createApp() {
   app.use(helmet());
 
   // CORS
-  const allowedOrigins =
-    process.env.NODE_ENV === "production"
-      ? [process.env.FRONTEND_URL]
-      : ["http://localhost:3000"];
+ const allowedOrigins = (
+  process.env.NODE_ENV === "production"
+    ? [process.env.FRONTEND_URL]
+    : ["http://localhost:3000"]
+).filter(Boolean);
 
-  console.log("[CORS] Origins autorisées:", allowedOrigins);
-
+  
   app.use(
     cors({
       origin: allowedOrigins,
