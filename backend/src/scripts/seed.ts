@@ -536,14 +536,6 @@ async function seed() {
 }
 
 // Exécuter le seeding
-seed()
-  .then(() => {
-    console.log("✅ Script de seeding exécuté avec succès");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("❌ Erreur lors de l'exécution du script:", error);
-    process.exit(1);
-  });
+
 
 export default seed;
