@@ -1,46 +1,49 @@
-console.log("[APP] app.ts chargé");
-
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import passport from "./config/passport";
+import oauthRoutes from "./routes/oauth";
 import helmet from "helmet";
 import morgan from "morgan";
-import cookieParser from "cookie-parser";
-import passport from "passport";
-import path from "path";
-
 import swaggerUi from "swagger-ui-express";
-import { specs } from "./config/swagger"; 
+import { specs } from "./config/swagger";
 
+// Routes
 import authRoutes from "./routes/authRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
-import oauthRoutes from "./routes/oauth";
+import taskRoutes from "./routes/taskRoutes";
+import commentRoutes from "./routes/commentRoutes";
+import { searchUsers, getAllUsers } from "./controllers/projectController";
 
-import { authenticateToken } from "./middleware/auth"; 
-import { searchUsers, getAllUsers } from "./controllers/projectController"; 
+// Middleware
+import { authenticateToken } from "./middleware/auth";
 
-export const createApp = () => {
+export function createApp() {
   const app = express();
 
+  // Cookies
   app.use(cookieParser());
   app.use(passport.initialize());
+
+  // Sécurité
   app.use(helmet());
 
-  // CORS dynamique via variable d'environnement
-  const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ["http://localhost:3000"];
-
-  console.log("[CORS] Origins autorisées:", allowedOrigins);
-
+  // CORS
   app.use(
     cors({
-      origin: allowedOrigins,
+      origin:
+        process.env.NODE_ENV === "production"
+          ? process.env.FRONTEND_URL
+          : "http://localhost:3000",
       credentials: true,
     })
   );
 
+  // Logs
   app.use(morgan("combined"));
+
+  // Body parser
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));
 
@@ -51,7 +54,6 @@ export const createApp = () => {
     swaggerUi.setup(specs, {
       customCss: ".swagger-ui .topbar { display: none }",
       customSiteTitle: "API Gestionnaire de Projets - Documentation",
-      customfavIcon: "/favicon.ico",
     })
   );
 
@@ -59,11 +61,17 @@ export const createApp = () => {
   app.use("/auth", authRoutes);
   app.use("/projects", projectRoutes);
   app.use("/dashboard", dashboardRoutes);
+  app.use("/tasks", taskRoutes);
+  app.use("/comments", commentRoutes);
+
+  // OAuth GitHub
   app.use(oauthRoutes);
 
+  // Users
   app.get("/users/search", authenticateToken as any, searchUsers);
   app.get("/users", authenticateToken as any, getAllUsers);
 
+  // Health check
   app.get("/health", (req, res) => {
     res.status(200).json({
       success: true,
@@ -73,74 +81,17 @@ export const createApp = () => {
     });
   });
 
+  // Route racine
   app.get("/", (req, res) => {
     res.status(200).json({
       success: true,
       message: "API REST avec authentification et gestion de projets",
       version: "1.0.0",
-      endpoints: {
-        auth: {
-          register: "POST /auth/register",
-          login: "POST /auth/login",
-          profile: "GET /auth/profile",
-          updateProfile: "PUT /auth/profile",
-          updatePassword: "PUT /auth/password",
-        },
-        projects: {
-          create: "POST /projects",
-          getAll: "GET /projects",
-          getOne: "GET /projects/:id",
-          update: "PUT /projects/:id",
-          delete: "DELETE /projects/:id",
-          addContributor: "POST /projects/:id/contributors",
-          removeContributor: "DELETE /projects/:id/contributors/:userId",
-        },
-        tasks: {
-          create: "POST /projects/:projectId/tasks",
-          getAll: "GET /projects/:projectId/tasks",
-          getOne: "GET /projects/:projectId/tasks/:taskId",
-          update: "PUT /projects/:projectId/tasks/:taskId",
-          delete: "DELETE /projects/:projectId/tasks/:taskId",
-        },
-        comments: {
-          create: "POST /projects/:projectId/tasks/:taskId/comments",
-          getAll: "GET /projects/:projectId/tasks/:taskId/comments",
-          getOne: "GET /projects/:projectId/tasks/:taskId/comments/:commentId",
-          update: "PUT /projects/:projectId/tasks/:taskId/comments/:commentId",
-          delete: "DELETE /projects/:projectId/tasks/:taskId/comments/:commentId",
-        },
-        health: "GET /health",
-      },
     });
   });
 
-  // ✅ NOUVEAU : Servir le frontend Next.js en production
-  if (process.env.NODE_ENV === "production") {
-    const frontendOutPath = path.join(__dirname, "../../frontend/out");
-    console.log("[FRONTEND] Serving static files from:", frontendOutPath);
-    
-    // Servir les fichiers statiques
-    app.use(express.static(frontendOutPath));
-    
-    // Route catch-all pour Next.js (doit être AVANT le 404)
-    app.get("*", (req, res, next) => {
-      // Ne pas intercepter les routes API
-      if (req.path.startsWith("/auth") || 
-          req.path.startsWith("/projects") || 
-          req.path.startsWith("/dashboard") ||
-          req.path.startsWith("/users") ||
-          req.path.startsWith("/health") ||
-          req.path.startsWith("/api-docs")) {
-        return next();
-      }
-      
-      // Servir index.html pour toutes les autres routes
-      res.sendFile(path.join(frontendOutPath, "index.html"));
-    });
-  }
-
-  // 404
-  app.use("*", (req, res) => {
+  // 404 — compatible Express 5 (pas de wildcard)
+  app.use((req, res) => {
     res.status(404).json({
       success: false,
       message: "Route non trouvée",
@@ -148,26 +99,5 @@ export const createApp = () => {
     });
   });
 
-  // Erreur globale
-  app.use(
-    (
-      error: any,
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      console.error("Erreur serveur:", error);
-      res.status(500).json({
-        success: false,
-        message: "Erreur interne du serveur",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error?.message
-            : "Internal server error",
-      });
-    }
-  );
-
-  console.log("[APP] app initialisée");
   return app;
-};
+}
