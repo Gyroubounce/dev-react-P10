@@ -1,5 +1,5 @@
 import express from "express";
-import seed from "../../scripts/seed"; // adapte le chemin
+import seed from "../scripts/seed"; // adapte le chemin
 
 const router = express.Router();
 
