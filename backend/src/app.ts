@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "./config/passport";
-import oauthRoutes from "./routes/oauth";
 import helmet from "helmet";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
@@ -14,6 +13,9 @@ import projectRoutes from "./routes/projectRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import oauthRoutes from "./routes/oauth";
+
+// Controllers
 import { searchUsers, getAllUsers } from "./controllers/projectController";
 
 // Middleware
@@ -21,6 +23,8 @@ import { authenticateToken } from "./middleware/auth";
 
 export function createApp() {
   const app = express();
+
+  console.log("[APP] Initialisation…");
 
   // Cookies
   app.use(cookieParser());
@@ -30,12 +34,16 @@ export function createApp() {
   app.use(helmet());
 
   // CORS
+  const allowedOrigins =
+    process.env.NODE_ENV === "production"
+      ? [process.env.FRONTEND_URL]
+      : ["http://localhost:3000"];
+
+  console.log("[CORS] Origins autorisées:", allowedOrigins);
+
   app.use(
     cors({
-      origin:
-        process.env.NODE_ENV === "production"
-          ? process.env.FRONTEND_URL
-          : "http://localhost:3000",
+      origin: allowedOrigins,
       credentials: true,
     })
   );
@@ -81,16 +89,49 @@ export function createApp() {
     });
   });
 
-  // Route racine
+  // ⭐ TA ROUTE RACINE COMPLÈTE (conservée)
   app.get("/", (req, res) => {
     res.status(200).json({
       success: true,
       message: "API REST avec authentification et gestion de projets",
       version: "1.0.0",
+      endpoints: {
+        auth: {
+          register: "POST /auth/register",
+          login: "POST /auth/login",
+          profile: "GET /auth/profile",
+          updateProfile: "PUT /auth/profile",
+          updatePassword: "PUT /auth/password",
+        },
+        projects: {
+          create: "POST /projects",
+          getAll: "GET /projects",
+          getOne: "GET /projects/:id",
+          update: "PUT /projects/:id",
+          delete: "DELETE /projects/:id",
+          addContributor: "POST /projects/:id/contributors",
+          removeContributor: "DELETE /projects/:id/contributors/:userId",
+        },
+        tasks: {
+          create: "POST /projects/:projectId/tasks",
+          getAll: "GET /projects/:projectId/tasks",
+          getOne: "GET /projects/:projectId/tasks/:taskId",
+          update: "PUT /projects/:projectId/tasks/:taskId",
+          delete: "DELETE /projects/:projectId/tasks/:taskId",
+        },
+        comments: {
+          create: "POST /projects/:projectId/tasks/:taskId/comments",
+          getAll: "GET /projects/:projectId/tasks/:taskId/comments",
+          getOne: "GET /projects/:projectId/tasks/:taskId/comments/:commentId",
+          update: "PUT /projects/:projectId/tasks/:taskId/comments/:commentId",
+          delete: "DELETE /projects/:projectId/tasks/:taskId/comments/:commentId",
+        },
+        health: "GET /health",
+      },
     });
   });
 
-  // 404 — compatible Express 5 (pas de wildcard)
+  // 404 — compatible Express 5
   app.use((req, res) => {
     res.status(404).json({
       success: false,
@@ -99,5 +140,26 @@ export function createApp() {
     });
   });
 
+  // Erreur globale
+  app.use(
+    (
+      error: any,
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      console.error("Erreur serveur:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erreur interne du serveur",
+        error:
+          process.env.NODE_ENV === "development"
+            ? error?.message
+            : "Internal server error",
+      });
+    }
+  );
+
+  console.log("[APP] Prêt.");
   return app;
 }
