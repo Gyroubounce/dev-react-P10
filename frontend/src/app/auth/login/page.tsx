@@ -68,14 +68,11 @@ export default function LoginPage() {
 
             {/* Mot de passe oublié centré */}
             <div className="w-70.75 text-center mt-4">
-              <Link
-                href="/auth/forgot-password"
-                className="text-brand-dark text-sm underline focus:ring-2 focus:ring-brand-dark"
-                aria-label="Récupérer votre mot de passe"
-              >
+              <p className="text-brand-dark text-sm">
                 Mot de passe oublié ?
-              </Link>
+              </p>
             </div>
+
           </div>
         </div>
 
