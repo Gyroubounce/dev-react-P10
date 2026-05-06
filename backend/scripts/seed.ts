@@ -545,3 +545,5 @@ seed()
     console.error("❌ Erreur lors de l'exécution du script:", error);
     process.exit(1);
   });
+
+export default seed;
