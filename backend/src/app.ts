@@ -34,19 +34,19 @@ export function createApp() {
   app.use(helmet());
 
   // CORS
- const allowedOrigins = (
+const allowedOrigins = (
   process.env.NODE_ENV === "production"
     ? [process.env.FRONTEND_URL]
     : ["http://localhost:3000"]
-).filter(Boolean);
+).filter((origin): origin is string => Boolean(origin));
 
-  
-  app.use(
-    cors({
-      origin: allowedOrigins,
-      credentials: true,
-    })
-  );
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 
   // Logs
   app.use(morgan("combined"));
