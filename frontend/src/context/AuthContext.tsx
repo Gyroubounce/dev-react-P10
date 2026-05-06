@@ -118,12 +118,10 @@ async function register(email: string, password: string): Promise<void> {
     setUser(null);
   }
 
-  useEffect(() => {
-    const isAuthPage = window.location.pathname.startsWith("/auth");
-    if (!isAuthPage) {
-      refreshProfile();
-    }
-  }, []);
+ useEffect(() => {
+  refreshProfile();
+}, []);
+
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, refreshProfile, register }}>
