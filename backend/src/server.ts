@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const prisma = new PrismaClient();
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT) || 8000;
 const HOST = "0.0.0.0";
 
 async function startServer() {
